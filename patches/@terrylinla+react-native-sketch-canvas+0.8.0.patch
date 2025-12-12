@@ -1,0 +1,77 @@
+diff --git a/node_modules/@terrylinla/react-native-sketch-canvas/android/.project b/node_modules/@terrylinla/react-native-sketch-canvas/android/.project
+new file mode 100644
+index 0000000..eb57dfc
+--- /dev/null
++++ b/node_modules/@terrylinla/react-native-sketch-canvas/android/.project
+@@ -0,0 +1,28 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<projectDescription>
++	<name>terrylinla_react-native-sketch-canvas</name>
++	<comment>Project terrylinla_react-native-sketch-canvas created by Buildship.</comment>
++	<projects>
++	</projects>
++	<buildSpec>
++		<buildCommand>
++			<name>org.eclipse.buildship.core.gradleprojectbuilder</name>
++			<arguments>
++			</arguments>
++		</buildCommand>
++	</buildSpec>
++	<natures>
++		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
++	</natures>
++	<filteredResources>
++		<filter>
++			<id>1761718206593</id>
++			<name></name>
++			<type>30</type>
++			<matcher>
++				<id>org.eclipse.core.resources.regexFilterMatcher</id>
++				<arguments>node_modules|\.git|__CREATED_BY_JAVA_LANGUAGE_SERVER__</arguments>
++			</matcher>
++		</filter>
++	</filteredResources>
++</projectDescription>
+diff --git a/node_modules/@terrylinla/react-native-sketch-canvas/android/build.gradle b/node_modules/@terrylinla/react-native-sketch-canvas/android/build.gradle
+index 31e44f2..7d19451 100644
+--- a/node_modules/@terrylinla/react-native-sketch-canvas/android/build.gradle
++++ b/node_modules/@terrylinla/react-native-sketch-canvas/android/build.gradle
+@@ -28,5 +28,5 @@ android {
+ }
+ 
+ dependencies {
+-    provided "com.facebook.react:react-native:+"
++    compileOnly "com.facebook.react:react-native:+"
+ }
+diff --git a/node_modules/@terrylinla/react-native-sketch-canvas/index.js b/node_modules/@terrylinla/react-native-sketch-canvas/index.js
+index 7935842..0c9568f 100644
+--- a/node_modules/@terrylinla/react-native-sketch-canvas/index.js
++++ b/node_modules/@terrylinla/react-native-sketch-canvas/index.js
+@@ -5,10 +5,10 @@ import ReactNative, {
+   Text,
+   TouchableOpacity,
+   FlatList,
+-  ViewPropTypes,
+ } from 'react-native'
+ import SketchCanvas from './src/SketchCanvas'
+ import { requestPermissions } from './src/handlePermissions';
++import { ViewPropTypes } from 'deprecated-react-native-prop-types';
+ 
+ export default class RNSketchCanvas extends React.Component {
+   static propTypes = {
+diff --git a/node_modules/@terrylinla/react-native-sketch-canvas/src/SketchCanvas.js b/node_modules/@terrylinla/react-native-sketch-canvas/src/SketchCanvas.js
+index 8f4fe48..90da6d7 100644
+--- a/node_modules/@terrylinla/react-native-sketch-canvas/src/SketchCanvas.js
++++ b/node_modules/@terrylinla/react-native-sketch-canvas/src/SketchCanvas.js
+@@ -9,10 +9,10 @@ import ReactNative, {
+   PanResponder,
+   PixelRatio,
+   Platform,
+-  ViewPropTypes,
+   processColor
+ } from 'react-native'
+ import { requestPermissions } from './handlePermissions';
++import { ViewPropTypes } from 'deprecated-react-native-prop-types';
+ 
+ const RNSketchCanvas = requireNativeComponent('RNSketchCanvas', SketchCanvas, {
+   nativeOnly: {

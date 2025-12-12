@@ -1,0 +1,30 @@
+[
+  {
+    "id": "n1",
+    "title": "Trail image",
+    "content": "Photo from the morning trail walk.",
+    "tags": ["image", "trail"],
+    "createdAt": 1690000000000,
+    "thumbnailUri": "",
+    "media": [{ "type": "image", "uri": "" }]
+  },
+  {
+    "id": "n2",
+    "title": "Boundary sketch",
+    "content": "Sketch of the boundary line and markers.",
+    "tags": ["sketch", "map"],
+    "createdAt": 1690500000000,
+    "thumbnailUri": "",
+    "media": [{ "type": "sketch", "uri": "" }]
+  },
+  {
+    "id": "n3",
+    "title": "Bird sounds",
+    "content": "Audio notes of bird calls near the river.",
+    "tags": ["audio", "wildlife"],
+    "createdAt": 1690800000000,
+    "thumbnailUri": "",
+    "media": [{ "type": "audio", "uri": "" }]
+  }
+]
+
