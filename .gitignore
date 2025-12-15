@@ -1,75 +1,108 @@
-# OSX
-#
+############################
+# macOS
+############################
 .DS_Store
+.AppleDouble
+.LSOverride
 
-# Xcode
-#
-build/
-*.pbxuser
-!default.pbxuser
-*.mode1v3
-!default.mode1v3
-*.mode2v3
-!default.mode2v3
-*.perspectivev3
-!default.perspectivev3
-xcuserdata
-*.xccheckout
-*.moved-aside
-DerivedData
-*.hmap
-*.ipa
-*.xcuserstate
-**/.xcode.env.local
-
-# Android/IntelliJ
-#
-build/
-.idea
-.gradle
-local.properties
-*.iml
-*.hprof
-.cxx/
-*.keystore
-!debug.keystore
-.kotlin/
-
-# node.js
-#
+############################
+# Node / JS
+############################
 node_modules/
-npm-debug.log
-yarn-error.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun.lockb
 
-# fastlane
-#
-# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
-# screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/
-
-**/fastlane/report.xml
-**/fastlane/Preview.html
-**/fastlane/screenshots
-**/fastlane/test_output
-
-# Bundle artifact
-*.jsbundle
-
-# Ruby / CocoaPods
-**/Pods/
-/vendor/bundle/
-
-# Temporary files created by Metro to check the health of the file watcher
+############################
+# Metro / React Native
+############################
 .metro-health-check*
+*.jsbundle
+*.map
+.expo/
+.expo-shared/
 
-# testing
-/coverage
+############################
+# Android
+############################
+android/.gradle/
+android/build/
+android/app/build/
+android/app/release/
+android/app/.cxx/
+android/.idea/
+android/.kotlin/
+android/*.iml
+android/local.properties
+android/.cxx/
+android/captures/
+*.apk
+*.aab
+*.hprof
+*.keystore
+!android/app/debug.keystore
 
-# Yarn
+############################
+# iOS
+############################
+ios/Pods/
+ios/build/
+ios/DerivedData/
+ios/*.xcworkspace
+ios/*.xcuserstate
+ios/**/*.xcuserdatad
+ios/**/*.xccheckout
+ios/.xcode.env.local
+
+############################
+# Xcode junk
+############################
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+!default.pbxuser
+!default.mode1v3
+!default.mode2v3
+!default.perspectivev3
+
+############################
+# Fastlane
+############################
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+############################
+# Coverage / Tests
+############################
+coverage/
+.nyc_output/
+
+############################
+# Env files
+############################
+.env
+.env.*
+!.env.example
+
+############################
+# Yarn (Berry)
+############################
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+############################
+# Misc
+############################
+.idea/
+.vscode/
+.tmp/
+temp/

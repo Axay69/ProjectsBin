@@ -12,11 +12,17 @@ type RootStackParamList = {
   TextRecognitionDemo: undefined;
   BlobCourierDemo: undefined;
   TurboImageDemo: undefined;
+  TableComponentDemo: undefined;
+  BottomSheetDemo: undefined;
+  HapticFeedbackDemo: undefined;
+  ReanimatedCarouselDemo: undefined;
   ReanimatedEnteringExiting: undefined;
   ReanimatedList: undefined;
   ReanimatedExpander: undefined;
   ReanimatedPopEnterLayout: undefined;
   ReanimatedDragLayout: undefined;
+  ReanimatedLayoutGallery: undefined;
+  ReanimatedKeyframesLayout: undefined;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -36,11 +42,18 @@ export default function HomeScreen({ navigation }: Props) {
         <TaskItem title="Text Recognition Demo" subtitle="Camera text recognition & translation" onPress={() => navigation.navigate('TextRecognitionDemo')} />
         <TaskItem title="Blob Courier Demo" subtitle="File upload/download with progress" onPress={() => navigation.navigate('BlobCourierDemo')} />
         <TaskItem title="Turbo Image Demo" subtitle="Fast caching, placeholders, prefetch" onPress={() => navigation.navigate('TurboImageDemo')} />
+        <TaskItem title="Table Component Demo" subtitle="Headers, rows, clickable cells" onPress={() => navigation.navigate('TableComponentDemo')} />
+        <TaskItem title="Bottom Sheet Demo" subtitle="Snap points, pan to close" onPress={() => navigation.navigate('BottomSheetDemo')} />
+        <TaskItem title="Haptic Feedback Demo" subtitle="Impact, selection, notifications" onPress={() => navigation.navigate('HapticFeedbackDemo')} />
+        <TaskItem title="Reanimated Carousel Demo" subtitle="Parallax, autoplay, looping" onPress={() => navigation.navigate('ReanimatedCarouselDemo')} />
         <TaskItem title="Reanimated: Entering/Exiting" subtitle="Animate mount/unmount" onPress={() => navigation.navigate('ReanimatedEnteringExiting')} />
         <TaskItem title="Reanimated: Animated List" subtitle="Insertions and deletions" onPress={() => navigation.navigate('ReanimatedList')} />
         <TaskItem title="Reanimated: Expander" subtitle="Animated layout transitions" onPress={() => navigation.navigate('ReanimatedExpander')} />
         <TaskItem title="Reanimated: PopEnter + Layout" subtitle="Keyframe entering + layout spring" onPress={() => navigation.navigate('ReanimatedPopEnterLayout')} />
         <TaskItem title="Reanimated: Drag + Layout" subtitle="Drag one; others layout" onPress={() => navigation.navigate('ReanimatedDragLayout')} />
+        <TaskItem title="Reanimated: Layout Gallery" subtitle="Grid or Masonry with layout" onPress={() => navigation.navigate('ReanimatedLayoutGallery')} />
+        <TaskItem title="Reanimated: Keyframes + Layout" subtitle="Entering/Exiting, Keyframes, Layout.delay()" onPress={() => navigation.navigate('ReanimatedKeyframesLayout')} />
+        
       </ScrollView>
     </View>
   );

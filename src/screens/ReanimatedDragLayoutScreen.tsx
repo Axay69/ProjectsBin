@@ -1,6 +1,6 @@
 
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { StyleSheet, View, Text } from "react-native"
 import Animated, {
   Layout,
@@ -46,14 +46,19 @@ export default function ReanimatedDragLayoutScreen() {
   }
 
   const animatedStyle = useAnimatedStyle(() => ({
-    position: "absolute",
-    left: 0,
-    right: 0,
-    // top: startY.value + y.value,
-    zIndex: 10,
-    transform: [{translateY: startY.value + y.value }],
+    // position: "absolute",
+    // left: 0,
+    // right: 0,
+    // // top: startY.value + y.value,
+    // zIndex: 10,
+    // transform: [{translateY: startY.value + y.value }],
+    backgroundColor: 'red',
   }));
 
+  useEffect(() => {
+    console.log('dragId', dragId);
+    console.log('items',  items);
+  }, [dragId])
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Drag + Layout</Text>
@@ -61,12 +66,14 @@ export default function ReanimatedDragLayoutScreen() {
 
       <View style={styles.list}>
         {items.map((id, index) => {
-          const isActive = id === dragId
+          const isActive = id === dragId;
 
+          console.log('id, isActive', id, isActive);
           return (
             <GestureDetector
               key={id}
               gesture={Gesture.Pan().onStart(() => {
+                startY.value = index * (ITEM_HEIGHT + 8)
                 runOnJS(setDragId)(id)
                 moveSteps.value = 0
                 console.log("onStart", id)
@@ -74,7 +81,6 @@ export default function ReanimatedDragLayoutScreen() {
                 x.value = event.translationX
                 y.value = event.translationY
                 isDragging.value = true
-
                 const threshold = ITEM_HEIGHT + 8
                 const step = Math.floor(event.translationY / threshold)
                 if (step > moveSteps.value) {
@@ -85,21 +91,25 @@ export default function ReanimatedDragLayoutScreen() {
                   moveSteps.value = moveSteps.value - 1
                 }
               }).onEnd((e) => {
-                runOnJS(setDragId)(null)
                 if (Math.abs(e.translationY) > ITEM_HEIGHT + 8) {
                   console.log('swap');
                   runOnJS(reorder)(e.translationY)
                 }
+              }).onFinalize(() => {
+                runOnJS(setDragId)(null)
                 x.value = withTiming(0)
                 y.value = withTiming(0)
                 isDragging.value = false
               })}
             >
+
               <Animated.View
                 layout={Layout.springify().stiffness(220).damping(18)}
-                style={[styles.item, isActive ? styles.draggedItem : {}]}
-              >
+                style={[]}
+                >
+              <View style={[styles.item, isActive ? styles.draggedItem : {}]}>
                 <Text style={styles.itemText}>Item #{id}</Text>
+                </View>
               </Animated.View>
             </GestureDetector>
           )

@@ -14,11 +14,17 @@ import KeyboardControllerDemoScreen from '../screens/KeyboardControllerDemoScree
 import TextRecognitionDemoScreen from '../screens/TextRecognitionDemoScreen'
 import BlobCourierDemoScreen from '../screens/BlobCourierDemoScreen'
 import TurboImageDemoScreen from '../screens/TurboImageDemoScreen'
+import TableComponentDemoScreen from '../screens/TableComponentDemoScreen'
 import ReanimatedEnteringExitingScreen from '../screens/ReanimatedEnteringExitingScreen'
 import ReanimatedListScreen from '../screens/ReanimatedListScreen'
 import ReanimatedExpanderScreen from '../screens/ReanimatedExpanderScreen'
 import ReanimatedPopEnterLayoutScreen from '../screens/ReanimatedPopEnterLayoutScreen'
 import ReanimatedDragLayoutScreen from '../screens/ReanimatedDragLayoutScreen'
+import ReanimatedLayoutGalleryScreen from '../screens/ReanimatedLayoutGalleryScreen'
+import ReanimatedKeyframesLayoutScreen from '../screens/ReanimatedKeyframesLayoutScreen'
+import BottomSheetDemoScreen from '../screens/BottomSheetDemoScreen'
+import HapticFeedbackDemoScreen from '../screens/HapticFeedbackDemoScreen'
+import ReanimatedCarouselDemoScreen from '../screens/ReanimatedCarouselDemoScreen'
 import XTHome from '../xtracker/screens/HomeScreen'
 import XTFriends from '../xtracker/screens/FriendsScreen'
 import XTProfile from '../xtracker/screens/ProfileScreen'
@@ -37,11 +43,17 @@ type RootStackParamList = {
   TextRecognitionDemo: undefined
   BlobCourierDemo: undefined
   TurboImageDemo: undefined
+  TableComponentDemo: undefined
+  BottomSheetDemo: undefined
+  HapticFeedbackDemo: undefined
+  ReanimatedCarouselDemo: undefined
   ReanimatedEnteringExiting: undefined
   ReanimatedList: undefined
   ReanimatedExpander: undefined
   ReanimatedPopEnterLayout: undefined
   ReanimatedDragLayout: undefined
+  ReanimatedLayoutGallery: undefined
+  ReanimatedKeyframesLayout: undefined
 }
 
 type XTHomeStackParamList = {
@@ -140,11 +152,17 @@ export default function AppNavigator() {
         <RootStack.Screen name="TextRecognitionDemo" component={TextRecognitionDemoScreen} />
         <RootStack.Screen name="BlobCourierDemo" component={BlobCourierDemoScreen} />
         <RootStack.Screen name="TurboImageDemo" component={TurboImageDemoScreen} />
+        <RootStack.Screen name="TableComponentDemo" component={TableComponentDemoScreen} />
+        <RootStack.Screen name="BottomSheetDemo" component={BottomSheetDemoScreen} />
+        <RootStack.Screen name="HapticFeedbackDemo" component={HapticFeedbackDemoScreen} />
+        <RootStack.Screen name="ReanimatedCarouselDemo" component={ReanimatedCarouselDemoScreen} />
         <RootStack.Screen name="ReanimatedEnteringExiting" component={ReanimatedEnteringExitingScreen} />
         <RootStack.Screen name="ReanimatedList" component={ReanimatedListScreen} />
         <RootStack.Screen name="ReanimatedExpander" component={ReanimatedExpanderScreen} />
         <RootStack.Screen name="ReanimatedPopEnterLayout" component={ReanimatedPopEnterLayoutScreen} />
         <RootStack.Screen name="ReanimatedDragLayout" component={ReanimatedDragLayoutScreen} />
+        <RootStack.Screen name="ReanimatedLayoutGallery" component={ReanimatedLayoutGalleryScreen} />
+        <RootStack.Screen name="ReanimatedKeyframesLayout" component={ReanimatedKeyframesLayoutScreen} />
       </RootStack.Navigator>
     </NavigationContainer>
   )
