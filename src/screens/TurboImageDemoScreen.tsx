@@ -27,7 +27,7 @@ const DataCacheScreen = () => {
   };
   return (
     <FlatList
-      keyExtractor={(item) => item.uri}
+      keyExtractor={item => item.uri}
       data={dataCachelistData}
       numColumns={3}
       getItemLayout={(_, index) => ({

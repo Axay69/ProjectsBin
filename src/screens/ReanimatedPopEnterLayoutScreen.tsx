@@ -1,57 +1,76 @@
-import React, { useState } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import Animated, { Keyframe, Layout } from 'react-native-reanimated'
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import Animated, { Keyframe, Layout } from 'react-native-reanimated';
 
-type RootStackParamList = { ReanimatedPopEnterLayout: undefined }
+type RootStackParamList = { ReanimatedPopEnterLayout: undefined };
 
-type Props = NativeStackScreenProps<RootStackParamList, 'ReanimatedPopEnterLayout'>
+type Props = NativeStackScreenProps<
+  RootStackParamList,
+  'ReanimatedPopEnterLayout'
+>;
 
 const PopEnter = new Keyframe({
   0: { transform: [{ scale: 0.9 }, { translateY: 20 }], opacity: 0 },
   0.6: { transform: [{ scale: 1.03 }, { translateY: -6 }], opacity: 1 },
   1: { transform: [{ scale: 1 }, { translateY: 0 }], opacity: 1 },
-})
+});
 
 export default function ReanimatedPopEnterLayoutScreen(_: Props) {
-  const [items, setItems] = useState<number[]>([6,5,4,3,2,1])
-
+  const [items, setItems] = useState<number[]>([6, 5, 4, 3, 2, 1]);
 
   const addItem = () => {
     let max = 1;
-    items.forEach((item) => {
+    items.forEach(item => {
       if (item > max) {
-        max = item
+        max = item;
       }
-    })
-    const next = max + 1
-    setItems([next, ...items])
-  }
+    });
+    const next = max + 1;
+    setItems([next, ...items]);
+  };
   const shuffle = () => {
-    const arr = [...items]
+    const arr = [...items];
     for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
-      ;[arr[i], arr[j]] = [arr[j], arr[i]]
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-    setItems(arr)
-  }
+    setItems(arr);
+  };
   const removeLast = () => {
-    setItems(items.slice(0, -1))
-  }
+    setItems(items.slice(0, -1));
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Keyframe Enter + Layout</Text>
-      <Text style={styles.desc}>Combine a popping keyframe on enter with spring layout transitions.</Text>
+      <Text style={styles.desc}>
+        Combine a popping keyframe on enter with spring layout transitions.
+      </Text>
 
       <View style={styles.row}>
-        <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={addItem} style={[styles.btn, styles.btnBlue]}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          activeOpacity={0.7}
+          onPress={addItem}
+          style={[styles.btn, styles.btnBlue]}
+        >
           <Text style={styles.btnLabel}>Add</Text>
         </TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={shuffle} style={[styles.btn, styles.btnGreen]}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          activeOpacity={0.7}
+          onPress={shuffle}
+          style={[styles.btn, styles.btnGreen]}
+        >
           <Text style={styles.btnLabel}>Shuffle</Text>
         </TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={removeLast} style={[styles.btn, styles.btnGray]}>
+        <TouchableOpacity
+          accessibilityRole="button"
+          activeOpacity={0.7}
+          onPress={removeLast}
+          style={[styles.btn, styles.btnGray]}
+        >
           <Text style={styles.btnLabel}>Remove last</Text>
         </TouchableOpacity>
       </View>
@@ -69,7 +88,7 @@ export default function ReanimatedPopEnterLayoutScreen(_: Props) {
         ))}
       </View>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -83,7 +102,19 @@ const styles = StyleSheet.create({
   btnGray: { backgroundColor: '#E5E7EB' },
   btnLabel: { color: '#fff', fontWeight: '600' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 12 },
-  card: { width: '30%', aspectRatio: 1, borderRadius: 12, backgroundColor: '#0EA5A4', justifyContent: 'center', alignItems: 'center' },
-  cardText: { color: '#fff', fontWeight: '700', textAlignVertical: 'center', alignSelf: 'center', flex: 1},
-})
-
+  card: {
+    width: '30%',
+    aspectRatio: 1,
+    borderRadius: 12,
+    backgroundColor: '#0EA5A4',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardText: {
+    color: '#fff',
+    fontWeight: '700',
+    textAlignVertical: 'center',
+    alignSelf: 'center',
+    flex: 1,
+  },
+});

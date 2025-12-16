@@ -10,12 +10,14 @@ import {
   Image,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {  useCameraDevice } from 'react-native-vision-camera';
-import { PhotoRecognizer, Camera,} from 'react-native-vision-camera-text-recognition';
+import { useCameraDevice } from 'react-native-vision-camera';
+import {
+  PhotoRecognizer,
+  Camera,
+} from 'react-native-vision-camera-text-recognition';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import { Platform } from 'react-native';
- 
 
 type RootStackParamList = {
   TextRecognitionDemo: undefined;
@@ -62,8 +64,6 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
     }
   };
 
- 
-
   const handlePhotoRecognition = async () => {
     try {
       const result = await launchImageLibrary({
@@ -81,7 +81,7 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
       logDebug('Photo selected:', uri);
 
       const recognitionResult = await PhotoRecognizer({ uri });
-      
+
       if (recognitionResult) {
         setRecognizedText(recognitionResult.resultText || '');
         setTextBlocks(recognitionResult.blocks || []);
@@ -90,7 +90,7 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
           'text length',
           recognitionResult.resultText?.length ?? 0,
           'blocks',
-          recognitionResult.blocks?.length ?? 0
+          recognitionResult.blocks?.length ?? 0,
         );
       }
     } catch (error: any) {
@@ -139,7 +139,7 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
               style={StyleSheet.absoluteFill}
               device={device}
               isActive={isActive}
-              resizeMode='contain'
+              resizeMode="contain"
               options={{ language }}
               mode={'recognize'}
               callback={(data: any) => {
@@ -156,7 +156,8 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
                     text = data;
                   } else if (data) {
                     blocks = data.blocks || data.result?.blocks || [];
-                    text = data.resultText || data.text || data.result?.text || '';
+                    text =
+                      data.resultText || data.text || data.result?.text || '';
                   }
                   setTextBlocks(blocks);
                   setRecognizedText(text);
@@ -170,15 +171,15 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
             <Camera
               style={StyleSheet.absoluteFill}
               device={device}
-              resizeMode='contain'
+              resizeMode="contain"
               isActive={isActive}
               options={{ from: 'en', to: 'es' }}
               mode={'translate'}
               callback={(data: any) => {
                 try {
                   let text = '';
-                  console.log('data--',data);
-                  
+                  console.log('data--', data);
+
                   if (typeof data === 'string') text = data;
                   else if (data) text = data.translatedText || data.text || '';
                   setTranslatedText(text);
@@ -191,10 +192,15 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
           <View style={styles.cameraOverlay}>
             <View style={styles.controls}>
               <TouchableOpacity
-                style={[styles.controlButton, !isActive && styles.controlButtonInactive]}
+                style={[
+                  styles.controlButton,
+                  !isActive && styles.controlButtonInactive,
+                ]}
                 onPress={() => setIsActive(!isActive)}
               >
-                <Text style={styles.controlButtonText}>{isActive ? 'Pause' : 'Resume'}</Text>
+                <Text style={styles.controlButtonText}>
+                  {isActive ? 'Pause' : 'Resume'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -205,7 +211,11 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
       {mode === 'photo' && (
         <View style={styles.photoContainer}>
           {selectedImage ? (
-            <Image source={{ uri: selectedImage }} style={styles.photoImage} resizeMode="contain" />
+            <Image
+              source={{ uri: selectedImage }}
+              style={styles.photoImage}
+              resizeMode="contain"
+            />
           ) : (
             <View style={styles.photoPlaceholder}>
               <Text style={styles.photoPlaceholderText}>No image selected</Text>
@@ -222,32 +232,59 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
 
       {/* Controls Panel */}
       <View style={styles.panel}>
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Mode Selection */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Mode</Text>
             <View style={styles.buttonRow}>
               <TouchableOpacity
-                style={[styles.modeButton, mode === 'recognize' && styles.modeButtonActive]}
+                style={[
+                  styles.modeButton,
+                  mode === 'recognize' && styles.modeButtonActive,
+                ]}
                 onPress={() => setMode('recognize')}
               >
-                <Text style={[styles.modeButtonText, mode === 'recognize' && styles.modeButtonTextActive]}>
+                <Text
+                  style={[
+                    styles.modeButtonText,
+                    mode === 'recognize' && styles.modeButtonTextActive,
+                  ]}
+                >
                   Recognize
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modeButton, mode === 'translate' && styles.modeButtonActive]}
+                style={[
+                  styles.modeButton,
+                  mode === 'translate' && styles.modeButtonActive,
+                ]}
                 onPress={() => setMode('translate')}
               >
-                <Text style={[styles.modeButtonText, mode === 'translate' && styles.modeButtonTextActive]}>
+                <Text
+                  style={[
+                    styles.modeButtonText,
+                    mode === 'translate' && styles.modeButtonTextActive,
+                  ]}
+                >
                   Translate
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modeButton, mode === 'photo' && styles.modeButtonActive]}
+                style={[
+                  styles.modeButton,
+                  mode === 'photo' && styles.modeButtonActive,
+                ]}
                 onPress={() => setMode('photo')}
               >
-                <Text style={[styles.modeButtonText, mode === 'photo' && styles.modeButtonTextActive]}>
+                <Text
+                  style={[
+                    styles.modeButtonText,
+                    mode === 'photo' && styles.modeButtonTextActive,
+                  ]}
+                >
                   Photo
                 </Text>
               </TouchableOpacity>
@@ -258,14 +295,35 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
           {mode === 'recognize' && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Language</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{paddingRight: 20,}} style={styles.languageScroll}>
-                {(['latin', 'chinese', 'devanagari', 'japanese', 'korean'] as Language[]).map((lang) => (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ paddingRight: 20 }}
+                style={styles.languageScroll}
+              >
+                {(
+                  [
+                    'latin',
+                    'chinese',
+                    'devanagari',
+                    'japanese',
+                    'korean',
+                  ] as Language[]
+                ).map(lang => (
                   <TouchableOpacity
                     key={lang}
-                    style={[styles.languageButton, language === lang && styles.languageButtonActive]}
+                    style={[
+                      styles.languageButton,
+                      language === lang && styles.languageButtonActive,
+                    ]}
                     onPress={() => setLanguage(lang)}
                   >
-                    <Text style={[styles.languageButtonText, language === lang && styles.languageButtonTextActive]}>
+                    <Text
+                      style={[
+                        styles.languageButtonText,
+                        language === lang && styles.languageButtonTextActive,
+                      ]}
+                    >
                       {lang.charAt(0).toUpperCase() + lang.slice(1)}
                     </Text>
                   </TouchableOpacity>
@@ -277,8 +335,13 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
           {/* Photo Recognition Button */}
           {mode === 'photo' && (
             <View style={styles.section}>
-              <TouchableOpacity style={styles.primaryButton} onPress={handlePhotoRecognition}>
-                <Text style={styles.primaryButtonText}>Select & Recognize Photo</Text>
+              <TouchableOpacity
+                style={styles.primaryButton}
+                onPress={handlePhotoRecognition}
+              >
+                <Text style={styles.primaryButtonText}>
+                  Select & Recognize Photo
+                </Text>
               </TouchableOpacity>
             </View>
           )}
@@ -290,9 +353,13 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
             </Text>
             <View style={styles.resultBox}>
               {mode === 'translate' ? (
-                <Text style={styles.resultText}>{translatedText || 'No translation yet...'}</Text>
+                <Text style={styles.resultText}>
+                  {translatedText || 'No translation yet...'}
+                </Text>
               ) : (
-                <Text style={styles.resultText}>{recognizedText || 'No text recognized yet...'}</Text>
+                <Text style={styles.resultText}>
+                  {recognizedText || 'No text recognized yet...'}
+                </Text>
               )}
             </View>
           </View>
@@ -300,15 +367,21 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
           {/* Text Blocks Details */}
           {mode === 'recognize' && textBlocks.length > 0 && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Text Blocks ({textBlocks.length})</Text>
+              <Text style={styles.sectionTitle}>
+                Text Blocks ({textBlocks.length})
+              </Text>
               {textBlocks.map((block: any, index: number) => (
                 <View key={index} style={styles.blockCard}>
                   <Text style={styles.blockTitle}>Block {index + 1}</Text>
-                  <Text style={styles.blockText}>{block.blockText || block.resultText || 'N/A'}</Text>
+                  <Text style={styles.blockText}>
+                    {block.blockText || block.resultText || 'N/A'}
+                  </Text>
                   {block.blockFrame && (
                     <Text style={styles.blockMeta}>
-                      Position: ({block.blockFrame.x?.toFixed(0)}, {block.blockFrame.y?.toFixed(0)}) | Size:{' '}
-                      {block.blockFrame.width?.toFixed(0)} × {block.blockFrame.height?.toFixed(0)}
+                      Position: ({block.blockFrame.x?.toFixed(0)},{' '}
+                      {block.blockFrame.y?.toFixed(0)}) | Size:{' '}
+                      {block.blockFrame.width?.toFixed(0)} ×{' '}
+                      {block.blockFrame.height?.toFixed(0)}
                     </Text>
                   )}
                 </View>
@@ -319,11 +392,10 @@ export default function TextRecognitionDemoScreen({ navigation }: Props) {
           {/* Info */}
           <View style={styles.section}>
             <Text style={styles.infoText}>
-              💡 Tips:{'\n'}
-              • Point camera at text for real-time recognition{'\n'}
-              • Use Photo mode to recognize text from existing images{'\n'}
-              • Switch languages based on the text you're scanning{'\n'}
-              • Translation mode translates English to Spanish
+              💡 Tips:{'\n'}• Point camera at text for real-time recognition
+              {'\n'}• Use Photo mode to recognize text from existing images
+              {'\n'}• Switch languages based on the text you're scanning{'\n'}•
+              Translation mode translates English to Spanish
             </Text>
           </View>
         </ScrollView>

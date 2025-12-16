@@ -19,9 +19,8 @@ function App() {
     <SafeAreaProvider>
       <KeyboardProvider>
         <GestureHandlerRootView>
-
-        <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-        <AppNavigator />
+          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+          <AppNavigator />
         </GestureHandlerRootView>
       </KeyboardProvider>
     </SafeAreaProvider>

@@ -1,17 +1,22 @@
-import { TouchableOpacity, StyleSheet, Text } from 'react-native'
-import { getTheme } from '../../theme'
-import { useNotesStore } from '../../lib/store'
+import { TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { getTheme } from '../../theme';
+import { useNotesStore } from '../../lib/store';
 
-type Props = { onPress: () => void }
+type Props = { onPress: () => void };
 
 export default function QuickAddFab({ onPress }: Props) {
-  const darkMode = useNotesStore(s => s.darkMode)
-  const theme = getTheme(darkMode)
+  const darkMode = useNotesStore(s => s.darkMode);
+  const theme = getTheme(darkMode);
   return (
-    <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={onPress} style={[styles.fab, { backgroundColor: theme.primary }]}>
+    <TouchableOpacity
+      accessibilityRole="button"
+      activeOpacity={0.7}
+      onPress={onPress}
+      style={[styles.fab, { backgroundColor: theme.primary }]}
+    >
       <Text style={styles.label}>＋</Text>
     </TouchableOpacity>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -30,4 +35,4 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   label: { color: '#fff', fontSize: 24, fontWeight: '700' },
-})
+});

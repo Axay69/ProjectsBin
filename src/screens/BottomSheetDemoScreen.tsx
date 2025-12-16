@@ -1,20 +1,22 @@
-import React, { useMemo, useRef, useState } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
-import HapticFeedback, { HapticFeedbackTypes } from 'react-native-haptic-feedback'
+import React, { useMemo, useRef, useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet';
+import HapticFeedback, {
+  HapticFeedbackTypes,
+} from 'react-native-haptic-feedback';
 
-type RootStackParamList = { BottomSheetDemo: undefined }
-type Props = NativeStackScreenProps<RootStackParamList, 'BottomSheetDemo'>
+type RootStackParamList = { BottomSheetDemo: undefined };
+type Props = NativeStackScreenProps<RootStackParamList, 'BottomSheetDemo'>;
 
 export default function BottomSheetDemoScreen({}: Props) {
-  const sheetRef = useRef<BottomSheet>(null)
-  const snapPoints = useMemo(() => ['25%', '50%', '90%'], [])
-  const [index, setIndex] = useState(-1)
+  const sheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ['25%', '50%', '90%'], []);
+  const [index, setIndex] = useState(-1);
 
   const haptic = (type: HapticFeedbackTypes) =>
-    HapticFeedback.trigger(type, { enableVibrateFallback: true })
+    HapticFeedback.trigger(type, { enableVibrateFallback: true });
 
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -30,36 +32,40 @@ export default function BottomSheetDemoScreen({}: Props) {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            haptic('impactLight')
-            sheetRef.current?.snapToIndex(0)
-          }}>
+            haptic('impactLight');
+            sheetRef.current?.snapToIndex(0);
+          }}
+        >
           <Text style={styles.buttonText}>Peek Actions (25%)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            haptic('impactMedium')
-            sheetRef.current?.snapToIndex(1)
-          }}>
+            haptic('impactMedium');
+            sheetRef.current?.snapToIndex(1);
+          }}
+        >
           <Text style={styles.buttonText}>Browse Options (50%)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            haptic('impactHeavy')
-            sheetRef.current?.snapToIndex(2)
-          }}>
+            haptic('impactHeavy');
+            sheetRef.current?.snapToIndex(2);
+          }}
+        >
           <Text style={styles.buttonText}>Full Details (90%)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.button, styles.closeBtn]}
           onPress={() => {
-            haptic('selection')
-            sheetRef.current?.close()
-          }}>
+            haptic('selection');
+            sheetRef.current?.close();
+          }}
+        >
           <Text style={styles.buttonText}>Close</Text>
         </TouchableOpacity>
       </View>
@@ -70,11 +76,11 @@ export default function BottomSheetDemoScreen({}: Props) {
         index={index}
         snapPoints={snapPoints}
         enablePanDownToClose
-        onChange={(i) => {
-          setIndex(i)
-          if (i !== -1) haptic('selection')
+        onChange={i => {
+          setIndex(i);
+          if (i !== -1) haptic('selection');
         }}
-        backgroundStyle={{backgroundColor: '#daefdbff'}}
+        backgroundStyle={{ backgroundColor: '#daefdbff' }}
       >
         <BottomSheetView style={styles.sheetContent}>
           <Text style={styles.sheetTitle}>Post Actions</Text>
@@ -82,19 +88,22 @@ export default function BottomSheetDemoScreen({}: Props) {
           <View style={styles.sheetRow}>
             <TouchableOpacity
               style={styles.actionBtn}
-              onPress={() => haptic('impactLight')}>
+              onPress={() => haptic('impactLight')}
+            >
               <Text style={styles.actionText}>Share</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionBtn}
-              onPress={() => haptic('selection')}>
+              onPress={() => haptic('selection')}
+            >
               <Text style={styles.actionText}>Copy Link</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.actionBtn}
-              onPress={() => haptic('notificationSuccess')}>
+              onPress={() => haptic('notificationSuccess')}
+            >
               <Text style={styles.actionText}>Bookmark</Text>
             </TouchableOpacity>
           </View>
@@ -107,9 +116,8 @@ export default function BottomSheetDemoScreen({}: Props) {
         </BottomSheetView>
       </BottomSheet>
     </GestureHandlerRootView>
-  )
+  );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -198,4 +206,4 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     textAlign: 'center',
   },
-})
+});

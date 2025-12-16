@@ -3,7 +3,7 @@
 ## Run (React Native CLI)
 
 1. Install deps: `yarn`
-2. iOS: `yarn ios`  Android: `yarn android`
+2. iOS: `yarn ios` Android: `yarn android`
 
 ## Run (Expo)
 
@@ -16,4 +16,3 @@ This module is Expo-ready. To run with Expo:
 ## SEED_DATA
 
 Seed notes are in `src/notes/assets/seed.json` and are loaded on first run via the notes store.
-

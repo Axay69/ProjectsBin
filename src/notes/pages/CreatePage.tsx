@@ -1,3 +1,2 @@
-import EditNotePage from './EditNotePage'
-export default EditNotePage
-
+import EditNotePage from './EditNotePage';
+export default EditNotePage;

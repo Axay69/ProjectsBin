@@ -1,55 +1,86 @@
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Image, Alert } from 'react-native'
-import { launchImageLibrary } from 'react-native-image-picker'
-import { useState } from 'react'
-import type { NativeStackScreenProps } from '@react-navigation/native-stack'
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Image,
+  Alert,
+} from 'react-native';
+import { launchImageLibrary } from 'react-native-image-picker';
+import { useState } from 'react';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-type StoryItem = { type: 'image' | 'video'; uri: string }
+type StoryItem = { type: 'image' | 'video'; uri: string };
 
 type RootStackParamList = {
-  InstaStorySetup: undefined
-  InstaStoryViewer: { items: StoryItem[] }
-}
+  InstaStorySetup: undefined;
+  InstaStoryViewer: { items: StoryItem[] };
+};
 
-type Props = NativeStackScreenProps<RootStackParamList, 'InstaStorySetup'>
+type Props = NativeStackScreenProps<RootStackParamList, 'InstaStorySetup'>;
 
 export default function InstaStorySetupScreen({ navigation }: Props) {
-  const [items, setItems] = useState<StoryItem[]>([])
+  const [items, setItems] = useState<StoryItem[]>([]);
 
   const pickMedia = async () => {
-    const res = await launchImageLibrary({ mediaType: 'mixed', selectionLimit: 10 })
-    const assets = res.assets || []
+    const res = await launchImageLibrary({
+      mediaType: 'mixed',
+      selectionLimit: 10,
+    });
+    const assets = res.assets || [];
     const next: StoryItem[] = assets
       .filter(a => !!a.uri)
-      .map(a => ({ type: (a.type?.includes('video') ? 'video' : 'image'), uri: a.uri as string }))
+      .map(a => ({
+        type: a.type?.includes('video') ? 'video' : 'image',
+        uri: a.uri as string,
+      }));
     if (!next.length) {
-      Alert.alert('No media selected', 'Please select at least one image or video.')
-      return
+      Alert.alert(
+        'No media selected',
+        'Please select at least one image or video.',
+      );
+      return;
     }
-    setItems(next)
-  }
+    setItems(next);
+  };
 
   const startViewer = () => {
     if (!items.length) {
-      Alert.alert('Add media first', 'Pick images or videos to view.')
-      return
+      Alert.alert('Add media first', 'Pick images or videos to view.');
+      return;
     }
-    navigation.navigate('InstaStoryViewer', { items })
-  }
+    navigation.navigate('InstaStoryViewer', { items });
+  };
 
   const renderItem = ({ item }: { item: StoryItem }) => (
-    <View style={[styles.thumb, { backgroundColor: '#e5e7eb' }]}> 
-      <Image source={{ uri: item.uri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+    <View style={[styles.thumb, { backgroundColor: '#e5e7eb' }]}>
+      <Image
+        source={{ uri: item.uri }}
+        style={{ width: '100%', height: '100%' }}
+        resizeMode="cover"
+      />
     </View>
-  )
+  );
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Insta Story Setup</Text>
       <View style={styles.row}>
-        <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={pickMedia} style={[styles.btn, { backgroundColor: '#2563eb' }]}> 
+        <TouchableOpacity
+          accessibilityRole="button"
+          activeOpacity={0.7}
+          onPress={pickMedia}
+          style={[styles.btn, { backgroundColor: '#2563eb' }]}
+        >
           <Text style={styles.btnText}>Pick Media</Text>
         </TouchableOpacity>
-        <TouchableOpacity accessibilityRole="button" activeOpacity={0.7} onPress={startViewer} style={[styles.btn, { backgroundColor: '#10b981' }]}> 
+        <TouchableOpacity
+          accessibilityRole="button"
+          activeOpacity={0.7}
+          onPress={startViewer}
+          style={[styles.btn, { backgroundColor: '#10b981' }]}
+        >
           <Text style={styles.btnText}>Start Viewer</Text>
         </TouchableOpacity>
       </View>
@@ -61,7 +92,7 @@ export default function InstaStorySetupScreen({ navigation }: Props) {
         contentContainerStyle={styles.grid}
       />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -71,6 +102,11 @@ const styles = StyleSheet.create({
   btn: { paddingHorizontal: 16, paddingVertical: 12, borderRadius: 10 },
   btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   grid: { marginTop: 16, gap: 8 },
-  thumb: { width: '31%', aspectRatio: 1, borderRadius: 8, overflow: 'hidden', margin: '1%' },
-})
-
+  thumb: {
+    width: '31%',
+    aspectRatio: 1,
+    borderRadius: 8,
+    overflow: 'hidden',
+    margin: '1%',
+  },
+});

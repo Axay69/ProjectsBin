@@ -5,7 +5,11 @@ type CounterButtonProps = { label: string; onPress: () => void };
 
 function CounterButton({ label, onPress }: CounterButtonProps) {
   return (
-    <Pressable accessibilityRole="button" style={styles.button} onPress={onPress}>
+    <Pressable
+      accessibilityRole="button"
+      style={styles.button}
+      onPress={onPress}
+    >
       <Text style={styles.buttonText}>{label}</Text>
     </Pressable>
   );
@@ -40,4 +44,3 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: '#fff', fontWeight: '700', fontSize: 16 },
 });
-

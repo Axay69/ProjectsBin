@@ -97,26 +97,25 @@ export default function KeyboardControllerDemoScreen() {
   // Listen to keyboard events for instant updates
   useKeyboardHandler(
     {
-      onStart: (e) => {
+      onStart: e => {
         'worklet';
-        console.log('start', e)
+        console.log('start', e);
         runOnJS(setKeyVisible)(e.height > 0 ? false : true);
       },
-      onMove: (e) => {
+      onMove: e => {
         'worklet';
-        console.log('move', e)
+        console.log('move', e);
 
         // runOnJS(setKeyVisible)(true);
       },
-      onEnd: (e) => {
+      onEnd: e => {
         'worklet';
-        console.log('ended', e)
+        console.log('ended', e);
         // runOnJS(setKeyVisible)(false);
       },
     },
-    []
+    [],
   );
-
 
   const sendMessage = () => {
     if (!inputText.trim()) return;
@@ -242,7 +241,7 @@ export default function KeyboardControllerDemoScreen() {
         data={messages}
         renderItem={renderMessage}
         keyExtractor={item => item.id}
-        contentContainerStyle={[styles.messagesList, { }]}
+        contentContainerStyle={[styles.messagesList, {}]}
         style={styles.messagesContainer}
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
@@ -258,7 +257,11 @@ export default function KeyboardControllerDemoScreen() {
         }}
       />
 
-      <View style={{ height: keyVisible ? keyboardState.height + toolBarHeight : 0 }} />
+      <View
+        style={{
+          height: keyVisible ? keyboardState.height + toolBarHeight : 0,
+        }}
+      />
 
       {/* Input Area with KeyboardStickyView - sticks above keyboard */}
       <KeyboardStickyView offset={{ closed: 0, opened: -toolBarHeight }}>

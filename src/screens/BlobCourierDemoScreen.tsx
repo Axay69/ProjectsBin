@@ -24,7 +24,9 @@ type DemoMode = 'download' | 'upload' | 'multipart' | 'downloadManager';
 
 export default function BlobCourierDemoScreen({ navigation }: Props) {
   const [mode, setMode] = useState<DemoMode>('download');
-  const [url, setUrl] = useState('https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf');
+  const [url, setUrl] = useState(
+    'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
+  );
   const [uploadFilePath, setUploadFilePath] = useState('');
   const [filename, setFilename] = useState('downloaded_file.pdf');
   const [progress, setProgress] = useState({ written: 0, total: 0 });
@@ -40,7 +42,8 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
 
   // Test server URLs (using httpbin.org for testing)
   const testUploadUrl = 'https://httpbin.org/post';
-  const testDownloadUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
+  const testDownloadUrl =
+    'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
 
   const handleDownload = async () => {
     if (!url.trim()) {
@@ -60,25 +63,32 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
     try {
       const response = await BlobCourier.settings({
         progressIntervalMilliseconds: 100,
-      }).onProgress((e) => {
-        setProgress({ written: e.written, total: e.total });
-        const pct = e.total > 0 ? (e.written / e.total) * 100 : 0;
-        setStatus(`Downloading: ${pct.toFixed(1)}%`);
-        if (opStartTime) {
-          const elapsed = (Date.now() - opStartTime) / 1000;
-          if (elapsed > 0) {
-            const speed = e.written / elapsed;
-            setAvgSpeedBps(speed);
-            if (e.total > 0 && speed > 0) setEtaSeconds(Math.max(0, (e.total - e.written) / speed));
+      })
+        .onProgress(e => {
+          setProgress({ written: e.written, total: e.total });
+          const pct = e.total > 0 ? (e.written / e.total) * 100 : 0;
+          setStatus(`Downloading: ${pct.toFixed(1)}%`);
+          if (opStartTime) {
+            const elapsed = (Date.now() - opStartTime) / 1000;
+            if (elapsed > 0) {
+              const speed = e.written / elapsed;
+              setAvgSpeedBps(speed);
+              if (e.total > 0 && speed > 0)
+                setEtaSeconds(Math.max(0, (e.total - e.written) / speed));
+            }
           }
-        }
-        log('Download progress', { written: e.written, total: e.total, pct: pct.toFixed(2) });
-      }).fetchBlob({
-        url: url,
-        filename: filename || 'downloaded_file',
-        method: 'GET',
-        mimeType: 'application/octet-stream',
-      });
+          log('Download progress', {
+            written: e.written,
+            total: e.total,
+            pct: pct.toFixed(2),
+          });
+        })
+        .fetchBlob({
+          url: url,
+          filename: filename || 'downloaded_file',
+          method: 'GET',
+          mimeType: 'application/octet-stream',
+        });
 
       setStatus('Download completed!');
       setResult({
@@ -86,8 +96,14 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
         filePath: response.data.absoluteFilePath,
         result: 'result' in response.data ? response.data.result : 'N/A',
       });
-      log('Download success', { filePath: response.data.absoluteFilePath, type: response.type });
-      Alert.alert('Success', `File downloaded to:\n${response.data.absoluteFilePath}`);
+      log('Download success', {
+        filePath: response.data.absoluteFilePath,
+        type: response.type,
+      });
+      Alert.alert(
+        'Success',
+        `File downloaded to:\n${response.data.absoluteFilePath}`,
+      );
     } catch (error: any) {
       setStatus(`Error: ${error.message}`);
       log('Download error', error);
@@ -117,30 +133,37 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
       const base = getFileName(uploadFilePath);
       const response = await BlobCourier.settings({
         progressIntervalMilliseconds: 100,
-      }).onProgress((e) => {
-        setProgress({ written: e.written, total: e.total });
-        const pct = e.total > 0 ? (e.written / e.total) * 100 : 0;
-        setStatus(`Uploading: ${pct.toFixed(1)}%`);
-        if (opStartTime) {
-          const elapsed = (Date.now() - opStartTime) / 1000;
-          if (elapsed > 0) {
-            const speed = e.written / elapsed;
-            setAvgSpeedBps(speed);
-            if (e.total > 0 && speed > 0) setEtaSeconds(Math.max(0, (e.total - e.written) / speed));
+      })
+        .onProgress(e => {
+          setProgress({ written: e.written, total: e.total });
+          const pct = e.total > 0 ? (e.written / e.total) * 100 : 0;
+          setStatus(`Uploading: ${pct.toFixed(1)}%`);
+          if (opStartTime) {
+            const elapsed = (Date.now() - opStartTime) / 1000;
+            if (elapsed > 0) {
+              const speed = e.written / elapsed;
+              setAvgSpeedBps(speed);
+              if (e.total > 0 && speed > 0)
+                setEtaSeconds(Math.max(0, (e.total - e.written) / speed));
+            }
           }
-        }
-        log('Upload progress', { written: e.written, total: e.total, pct: pct.toFixed(2) });
-      }).uploadBlob({
-        url: testUploadUrl,
-        absoluteFilePath: uploadFilePath.replace('file://', ''),
-        method: 'POST',
-        mimeType: mime || 'application/octet-stream',
-        headers: {
-          'X-Custom-Header': 'BlobCourier-Demo',
-          'X-Filename': base,
-        },
-        returnResponse: true,
-      });
+          log('Upload progress', {
+            written: e.written,
+            total: e.total,
+            pct: pct.toFixed(2),
+          });
+        })
+        .uploadBlob({
+          url: testUploadUrl,
+          absoluteFilePath: uploadFilePath.replace('file://', ''),
+          method: 'POST',
+          mimeType: mime || 'application/octet-stream',
+          headers: {
+            'X-Custom-Header': 'BlobCourier-Demo',
+            'X-Filename': base,
+          },
+          returnResponse: true,
+        });
 
       setStatus('Upload completed!');
       setResult({
@@ -148,8 +171,14 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
         responseCode: response.response.code,
         responseHeaders: response.response.headers,
       });
-      log('Upload success', { code: response.response.code, filePath: response.absoluteFilePath });
-      Alert.alert('Success', `Upload completed!\nResponse Code: ${response.response.code}`);
+      log('Upload success', {
+        code: response.response.code,
+        filePath: response.absoluteFilePath,
+      });
+      Alert.alert(
+        'Success',
+        `Upload completed!\nResponse Code: ${response.response.code}`,
+      );
     } catch (error: any) {
       setStatus(`Error: ${error.message}`);
       log('Upload error', error);
@@ -179,42 +208,49 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
       const base = getFileName(uploadFilePath) || 'file';
       const response = await BlobCourier.settings({
         progressIntervalMilliseconds: 100,
-      }).onProgress((e) => {
-        setProgress({ written: e.written, total: e.total });
-        const pct = e.total > 0 ? (e.written / e.total) * 100 : 0;
-        setStatus(`Uploading: ${pct.toFixed(1)}%`);
-        if (opStartTime) {
-          const elapsed = (Date.now() - opStartTime) / 1000;
-          if (elapsed > 0) {
-            const speed = e.written / elapsed;
-            setAvgSpeedBps(speed);
-            if (e.total > 0 && speed > 0) setEtaSeconds(Math.max(0, (e.total - e.written) / speed));
+      })
+        .onProgress(e => {
+          setProgress({ written: e.written, total: e.total });
+          const pct = e.total > 0 ? (e.written / e.total) * 100 : 0;
+          setStatus(`Uploading: ${pct.toFixed(1)}%`);
+          if (opStartTime) {
+            const elapsed = (Date.now() - opStartTime) / 1000;
+            if (elapsed > 0) {
+              const speed = e.written / elapsed;
+              setAvgSpeedBps(speed);
+              if (e.total > 0 && speed > 0)
+                setEtaSeconds(Math.max(0, (e.total - e.written) / speed));
+            }
           }
-        }
-        log('Multipart progress', { written: e.written, total: e.total, pct: pct.toFixed(2) });
-      }).uploadParts({
-        url: testUploadUrl,
-        method: 'POST',
-        parts: {
-          file: {
-            type: 'file',
-            payload: {
-              absoluteFilePath: uploadFilePath.replace('file://', ''),
-              mimeType: mime,
-              filename: base,
+          log('Multipart progress', {
+            written: e.written,
+            total: e.total,
+            pct: pct.toFixed(2),
+          });
+        })
+        .uploadParts({
+          url: testUploadUrl,
+          method: 'POST',
+          parts: {
+            file: {
+              type: 'file',
+              payload: {
+                absoluteFilePath: uploadFilePath.replace('file://', ''),
+                mimeType: mime,
+                filename: base,
+              },
+            },
+            textField: {
+              type: 'string',
+              payload: 'Hello from BlobCourier!',
+            },
+            anotherField: {
+              type: 'string',
+              payload: 'Multipart upload demo',
             },
           },
-          textField: {
-            type: 'string',
-            payload: 'Hello from BlobCourier!',
-          },
-          anotherField: {
-            type: 'string',
-            payload: 'Multipart upload demo',
-          },
-        },
-        returnResponse: true,
-      });
+          returnResponse: true,
+        });
 
       setStatus('Multipart upload completed!');
       setResult({
@@ -222,7 +258,10 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
         responseHeaders: response.response.headers,
       });
       log('Multipart success', { code: response.response.code });
-      Alert.alert('Success', `Multipart upload completed!\nResponse Code: ${response.response.code}`);
+      Alert.alert(
+        'Success',
+        `Multipart upload completed!\nResponse Code: ${response.response.code}`,
+      );
     } catch (error: any) {
       setStatus(`Error: ${error.message}`);
       log('Multipart error', error);
@@ -239,7 +278,10 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
     }
 
     if (Platform.OS !== 'android') {
-      Alert.alert('Info', 'Android Download Manager is only available on Android');
+      Alert.alert(
+        'Info',
+        'Android Download Manager is only available on Android',
+      );
       return;
     }
 
@@ -272,7 +314,7 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
       log('Android DM success', { filePath: response.data.absoluteFilePath });
       Alert.alert(
         'Success',
-        'Download started in Android Download Manager.\nCheck your notifications!'
+        'Download started in Android Download Manager.\nCheck your notifications!',
       );
     } catch (error: any) {
       setStatus(`Error: ${error.message}`);
@@ -298,7 +340,11 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
 
       const uri = result.assets[0].uri;
       setUploadFilePath(uri);
-      setStatus(`File selected: ${result.assets[0].fileName || uri.split('/').pop() || 'file'}`);
+      setStatus(
+        `File selected: ${
+          result.assets[0].fileName || uri.split('/').pop() || 'file'
+        }`,
+      );
       log('File picked', { uri, name: result.assets[0].fileName });
     } catch (error: any) {
       Alert.alert('Error', `Failed to pick file: ${error.message}`);
@@ -312,19 +358,39 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Mode Selection */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Demo Mode</Text>
           <View style={styles.modeContainer}>
-            {(['download', 'upload', 'multipart', 'downloadManager'] as DemoMode[]).map((m) => (
+            {(
+              [
+                'download',
+                'upload',
+                'multipart',
+                'downloadManager',
+              ] as DemoMode[]
+            ).map(m => (
               <TouchableOpacity
                 key={m}
-                style={[styles.modeButton, mode === m && styles.modeButtonActive]}
+                style={[
+                  styles.modeButton,
+                  mode === m && styles.modeButtonActive,
+                ]}
                 onPress={() => setMode(m)}
               >
-                <Text style={[styles.modeButtonText, mode === m && styles.modeButtonTextActive]}>
-                  {m === 'downloadManager' ? 'Android DM' : m.charAt(0).toUpperCase() + m.slice(1)}
+                <Text
+                  style={[
+                    styles.modeButtonText,
+                    mode === m && styles.modeButtonTextActive,
+                  ]}
+                >
+                  {m === 'downloadManager'
+                    ? 'Android DM'
+                    : m.charAt(0).toUpperCase() + m.slice(1)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -356,7 +422,10 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
             </View>
             <View style={styles.section}>
               <TouchableOpacity
-                style={[styles.primaryButton, isLoading && styles.primaryButtonDisabled]}
+                style={[
+                  styles.primaryButton,
+                  isLoading && styles.primaryButtonDisabled,
+                ]}
                 onPress={handleDownload}
                 disabled={isLoading}
               >
@@ -375,8 +444,13 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
           <>
             <View style={styles.section}>
               <Text style={styles.label}>Select File to Upload</Text>
-              <TouchableOpacity style={styles.secondaryButton} onPress={pickFile}>
-                <Text style={styles.secondaryButtonText}>Pick Image/Video File</Text>
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={pickFile}
+              >
+                <Text style={styles.secondaryButtonText}>
+                  Pick Image/Video File
+                </Text>
               </TouchableOpacity>
               {uploadFilePath ? (
                 <Text style={styles.filePathText} numberOfLines={1}>
@@ -395,7 +469,11 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
                 autoCapitalize="none"
               />
               <TouchableOpacity
-                style={[styles.primaryButton, (!customPathInput || isLoading) && styles.primaryButtonDisabled]}
+                style={[
+                  styles.primaryButton,
+                  (!customPathInput || isLoading) &&
+                    styles.primaryButtonDisabled,
+                ]}
                 onPress={() => {
                   if (!customPathInput) return;
                   setUploadFilePath(customPathInput);
@@ -419,7 +497,11 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
             </View>
             <View style={styles.section}>
               <TouchableOpacity
-                style={[styles.primaryButton, (isLoading || !uploadFilePath) && styles.primaryButtonDisabled]}
+                style={[
+                  styles.primaryButton,
+                  (isLoading || !uploadFilePath) &&
+                    styles.primaryButtonDisabled,
+                ]}
                 onPress={handleUpload}
                 disabled={isLoading || !uploadFilePath}
               >
@@ -438,8 +520,13 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
           <>
             <View style={styles.section}>
               <Text style={styles.label}>Select File for Multipart Upload</Text>
-              <TouchableOpacity style={styles.secondaryButton} onPress={pickFile}>
-                <Text style={styles.secondaryButtonText}>Pick Image/Video File</Text>
+              <TouchableOpacity
+                style={styles.secondaryButton}
+                onPress={pickFile}
+              >
+                <Text style={styles.secondaryButtonText}>
+                  Pick Image/Video File
+                </Text>
               </TouchableOpacity>
               {uploadFilePath ? (
                 <Text style={styles.filePathText} numberOfLines={1}>
@@ -449,12 +536,17 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
             </View>
             <View style={styles.section}>
               <Text style={styles.infoText}>
-                This will upload a file along with text fields in a multipart form.
+                This will upload a file along with text fields in a multipart
+                form.
               </Text>
             </View>
             <View style={styles.section}>
               <TouchableOpacity
-                style={[styles.primaryButton, (isLoading || !uploadFilePath) && styles.primaryButtonDisabled]}
+                style={[
+                  styles.primaryButton,
+                  (isLoading || !uploadFilePath) &&
+                    styles.primaryButtonDisabled,
+                ]}
                 onPress={handleMultipartUpload}
                 disabled={isLoading || !uploadFilePath}
               >
@@ -494,20 +586,27 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
             {Platform.OS !== 'android' && (
               <View style={styles.section}>
                 <Text style={styles.warningText}>
-                  ⚠️ Android Download Manager is only available on Android devices
+                  ⚠️ Android Download Manager is only available on Android
+                  devices
                 </Text>
               </View>
             )}
             <View style={styles.section}>
               <TouchableOpacity
-                style={[styles.primaryButton, (isLoading || Platform.OS !== 'android') && styles.primaryButtonDisabled]}
+                style={[
+                  styles.primaryButton,
+                  (isLoading || Platform.OS !== 'android') &&
+                    styles.primaryButtonDisabled,
+                ]}
                 onPress={handleDownloadWithManager}
                 disabled={isLoading || Platform.OS !== 'android'}
               >
                 {isLoading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.primaryButtonText}>Download with Android DM</Text>
+                  <Text style={styles.primaryButtonText}>
+                    Download with Android DM
+                  </Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -519,13 +618,20 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
           <View style={styles.section}>
             <View style={styles.progressContainer}>
               <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${getProgressPercentage()}%` }]} />
+                <View
+                  style={[
+                    styles.progressFill,
+                    { width: `${getProgressPercentage()}%` },
+                  ]}
+                />
               </View>
               <Text style={styles.progressText}>
-                {getProgressPercentage().toFixed(1)}% ({formatBytes(progress.written)} / {formatBytes(progress.total)})
+                {getProgressPercentage().toFixed(1)}% (
+                {formatBytes(progress.written)} / {formatBytes(progress.total)})
               </Text>
               <Text style={styles.progressText}>
-                {avgSpeedBps > 0 ? `${formatBytes(avgSpeedBps)}/s` : '—'} {etaSeconds != null ? `ETA ${formatEta(etaSeconds)}` : ''}
+                {avgSpeedBps > 0 ? `${formatBytes(avgSpeedBps)}/s` : '—'}{' '}
+                {etaSeconds != null ? `ETA ${formatEta(etaSeconds)}` : ''}
               </Text>
             </View>
           </View>
@@ -546,7 +652,9 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Result</Text>
             <View style={styles.resultBox}>
-              <Text style={styles.resultText}>{JSON.stringify(result, null, 2)}</Text>
+              <Text style={styles.resultText}>
+                {JSON.stringify(result, null, 2)}
+              </Text>
             </View>
           </View>
         )}
@@ -555,13 +663,10 @@ export default function BlobCourierDemoScreen({ navigation }: Props) {
         <View style={styles.section}>
           <Text style={styles.infoTitle}>Features Demonstrated:</Text>
           <Text style={styles.infoText}>
-            ✓ File download with progress tracking{'\n'}
-            ✓ File upload with progress tracking{'\n'}
-            ✓ Multipart form uploads{'\n'}
-            ✓ Android Download Manager integration{'\n'}
-            ✓ Custom headers and methods{'\n'}
-            ✓ Progress callbacks{'\n'}
-            ✓ Response handling
+            ✓ File download with progress tracking{'\n'}✓ File upload with
+            progress tracking{'\n'}✓ Multipart form uploads{'\n'}✓ Android
+            Download Manager integration{'\n'}✓ Custom headers and methods{'\n'}
+            ✓ Progress callbacks{'\n'}✓ Response handling
           </Text>
         </View>
       </ScrollView>
@@ -574,7 +679,7 @@ function formatBytes(bytes: number): string {
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
 }
 
 function getFileName(path: string): string {

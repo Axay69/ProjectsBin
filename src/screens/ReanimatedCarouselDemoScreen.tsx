@@ -24,7 +24,7 @@
 //         mode="parallax"
 //         modeConfig={{ parallaxScrollingScale: 0.85, parallaxScrollingOffset: 60 }}
 //         renderItem={({ index }) => (
-//           <View style={[styles.card, { backgroundColor: colors[index % colors.length] }]}> 
+//           <View style={[styles.card, { backgroundColor: colors[index % colors.length] }]}>
 //             <Text style={styles.cardText}>Item {index + 1}</Text>
 //           </View>
 //         )}
@@ -42,17 +42,17 @@
 //   cardText: { color: '#fff', fontSize: 20, fontWeight: '700' },
 // })
 
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
 
 const ReanimatedCarouselDemoScreen = () => {
   return (
     <View>
       <Text>ReanimatedCarouselDemoScreen</Text>
     </View>
-  )
-}
+  );
+};
 
-export default ReanimatedCarouselDemoScreen
+export default ReanimatedCarouselDemoScreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({});
