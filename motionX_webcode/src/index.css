@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* MotionX Dark Theme */
+    --background: 213 30% 6%;
+    --foreground: 220 14% 92%;
+
+    --card: 213 30% 10%;
+    --card-foreground: 220 14% 92%;
+
+    --popover: 213 30% 10%;
+    --popover-foreground: 220 14% 92%;
+
+    --primary: 210 100% 56%;
+    --primary-foreground: 220 14% 92%;
+
+    --secondary: 205 100% 65%;
+    --secondary-foreground: 213 30% 6%;
+
+    --muted: 213 20% 18%;
+    --muted-foreground: 220 8% 55%;
+
+    --accent: 210 100% 56%;
+    --accent-foreground: 220 14% 92%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 220 14% 92%;
+
+    --border: 213 20% 18%;
+    --input: 213 20% 18%;
+    --ring: 210 100% 56%;
+
+    --radius: 0.75rem;
+
+    /* Custom MotionX tokens */
+    --glow-primary: 210 100% 56%;
+    --glow-secondary: 205 100% 65%;
+    --surface-elevated: 213 30% 12%;
+  }
+
+  .dark {
+    --background: 213 30% 6%;
+    --foreground: 220 14% 92%;
+    --card: 213 30% 10%;
+    --card-foreground: 220 14% 92%;
+    --popover: 213 30% 10%;
+    --popover-foreground: 220 14% 92%;
+    --primary: 210 100% 56%;
+    --primary-foreground: 220 14% 92%;
+    --secondary: 205 100% 65%;
+    --secondary-foreground: 213 30% 6%;
+    --muted: 213 20% 18%;
+    --muted-foreground: 220 8% 55%;
+    --accent: 210 100% 56%;
+    --accent-foreground: 220 14% 92%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 220 14% 92%;
+    --border: 213 20% 18%;
+    --input: 213 20% 18%;
+    --ring: 210 100% 56%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@layer utilities {
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(var(--glow-primary) / 0.3);
+  }
+  
+  .glow-primary-sm {
+    box-shadow: 0 0 10px hsl(var(--glow-primary) / 0.2);
+  }
+
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+  }
+
+  .card-press {
+    @apply transition-transform duration-150 ease-out active:scale-[0.97];
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 1rem);
+  }
+}

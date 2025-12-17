@@ -29,17 +29,21 @@ import ReanimatedCarouselDemoScreen from '../screens/ReanimatedCarouselDemoScree
 import MotiStateMachineButtonScreen from '../screens/MotiStateMachineButtonScreen';
 import MotiToastStackScreen from '../screens/MotiToastStackScreen';
 import MotiAnimatedTabBarScreen from '../screens/MotiAnimatedTabBarScreen';
+import SystemNavigationBarDemoScreen from '../screens/SystemNavigationBarDemoScreen';
 import XTHome from '../xtracker/screens/HomeScreen';
 import XTFriends from '../xtracker/screens/FriendsScreen';
 import XTProfile from '../xtracker/screens/ProfileScreen';
 import XTChallengeDetail from '../xtracker/screens/ChallengeDetailScreen';
 import XTFriendProgress from '../xtracker/screens/FriendProgressScreen';
+import MotionXFlow from '../motionx/MotionXFlow';
 
 type RootStackParamList = {
   Home: undefined;
   Counter: undefined;
   Todos: undefined;
   XTracker: undefined;
+  MotionX: undefined;
+  SystemNavigationBarDemo: undefined;
   Notes: undefined;
   InstaStorySetup: undefined;
   InstaStoryViewer: { items: { type: 'image' | 'video'; uri: string }[] };
@@ -193,6 +197,11 @@ export default function AppNavigator() {
         <RootStack.Screen name="Home" component={HomeScreen} />
         <RootStack.Screen name="Counter" component={CounterScreen} />
         <RootStack.Screen name="Todos" component={TodoScreen} />
+        <RootStack.Screen name="MotionX" children={() => <MotionXFlow />} />
+        <RootStack.Screen
+          name="SystemNavigationBarDemo"
+          component={SystemNavigationBarDemoScreen}
+        />
         <RootStack.Screen
           name="XTracker"
           children={() => (

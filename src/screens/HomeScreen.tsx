@@ -34,6 +34,8 @@ type RootStackParamList = {
   MotiStateMachineButton: undefined;
   MotiToastStack: undefined;
   MotiAnimatedTabBar: undefined;
+  MotionX: undefined;
+  SystemNavigationBarDemo: undefined;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -46,6 +48,7 @@ export default function HomeScreen({ navigation }: Props) {
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, gap: 10, paddingBottom: 20 }}
         style={styles.list}
+        showsVerticalScrollIndicator={false}
       >
         <TaskItem
           title="Task 1: Counter"
@@ -147,6 +150,11 @@ export default function HomeScreen({ navigation }: Props) {
           subtitle="Entering/Exiting, Keyframes, Layout.delay()"
           onPress={() => navigation.navigate('ReanimatedKeyframesLayout')}
         />
+          <TaskItem
+            title="System Navigation Bar Demo"
+            subtitle="Android nav bar color & immersive"
+            onPress={() => navigation.navigate('SystemNavigationBarDemo')}
+          />
         <TaskItem
           title="Reanimated: Custom Child Wrapper"
           subtitle="Animate child layout when grid reshapes"
@@ -166,6 +174,11 @@ export default function HomeScreen({ navigation }: Props) {
           title="Moti: Animated Tab Bar"
           subtitle="Sliding indicator, scale + color"
           onPress={() => navigation.navigate('MotiAnimatedTabBar')}
+        />
+        <TaskItem
+          title="MotionX"
+          subtitle="Fitness App"
+          onPress={() => navigation.navigate('MotionX')}
         />
       </ScrollView>
     </View>
