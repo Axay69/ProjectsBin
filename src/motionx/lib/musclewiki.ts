@@ -5,9 +5,11 @@ import RNFetchBlob from 'rn-fetch-blob';
 let client: AxiosInstance | null = null;
 
 export const muscleWikiApiKey = 'b65e121ebfmsh20c0fac4910f5dcp1d1de7jsn524616479caa';
+export const muscleWikiApiKey2 = '53eb414801msh1122e098717335fp15a909jsnc60e07ecbee3';
+export const muscleWikiApiHost = 'musclewiki-api.p.rapidapi.com';
 
 function getClient() {
-  const key = muscleWikiApiKey;
+  const key = mmkv.getString('musclewiki_api_key') || muscleWikiApiKey;
   if (!client) {
     client = axios.create({
       baseURL: 'https://musclewiki-api.p.rapidapi.com',
@@ -23,8 +25,14 @@ function getClient() {
 }
 
 export function setMuscleWikiApiKey(key: string) {
-  mmkv.set('musclewiki_api_key', muscleWikiApiKey);
+  console.log('musclewiki_api_key', key);
+  
+  mmkv.set('musclewiki_api_key', key);
   if (client) client.defaults.headers['x-rapidapi-key'] = key;
+}
+
+export function getStoredMuscleWikiApiKey() {
+  return mmkv.getString('musclewiki_api_key');
 }
 
 export type MuscleWikiExerciseSummary = {

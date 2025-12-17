@@ -98,13 +98,13 @@ export default function MuscleWikiDetailScreen() {
                 </View>
               ))}
               {detail.category ? (
-                <View style={{ backgroundColor: '#111827', borderColor: '#1F2937', borderWidth: 1, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 16, marginRight: 8, marginBottom: 8 }}>
-                  <Text style={{ color: '#9CA3AF', fontSize: 12 }}>{detail.category}</Text>
+                <View style={{ backgroundColor: 'rgba(59, 130, 246, 0.12)', borderColor: '#3B82F6', borderWidth: 1, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 16, marginRight: 8, marginBottom: 8 }}>
+                  <Text style={{ color: '#60A5FA', fontSize: 12 }}>Category: {detail.category}</Text>
                 </View>
               ) : null}
               {detail.difficulty ? (
-                <View style={{ backgroundColor: '#111827', borderColor: '#1F2937', borderWidth: 1, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 16, marginRight: 8, marginBottom: 8 }}>
-                  <Text style={{ color: '#9CA3AF', fontSize: 12 }}>{detail.difficulty}</Text>
+                <View style={{ backgroundColor: 'rgba(245, 158, 11, 0.12)', borderColor: '#F59E0B', borderWidth: 1, paddingHorizontal: 8, paddingVertical: 6, borderRadius: 16, marginRight: 8, marginBottom: 8 }}>
+                  <Text style={{ color: '#FBBF24', fontSize: 12 }}>Difficulty: {detail.difficulty}</Text>
                 </View>
               ) : null}
             </View>

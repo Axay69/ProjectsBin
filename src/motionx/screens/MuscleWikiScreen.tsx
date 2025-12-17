@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, ScrollView, Modal, TextInput, Linking, KeyboardAvoidingView, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { showToast } from '../lib/toast';
-import { getExercises, getFilters, MuscleWikiExerciseSummary } from '../lib/musclewiki';
+import { getExercises, getFilters, MuscleWikiExerciseSummary, getStoredMuscleWikiApiKey, setMuscleWikiApiKey } from '../lib/musclewiki';
 
 export default function MuscleWikiScreen({ route }: any) {
     const navigation = useNavigation<any>();
@@ -25,8 +25,16 @@ export default function MuscleWikiScreen({ route }: any) {
     const [offset, setOffset] = useState(0);
     const [hasMore, setHasMore] = useState(true);
 
+    const [showKeyModal, setShowKeyModal] = useState(false);
+    const [apiKeyInput, setApiKeyInput] = useState('');
+
     // Effect to handle navigation parameters from BodyMap
     useEffect(() => {
+        const key = getStoredMuscleWikiApiKey();
+        if (!key) {
+            setShowKeyModal(true);
+        }
+
         if (route?.params?.filterMuscle) {
             const m = route.params.filterMuscle;
             console.log('Received filterMuscle:', m);
@@ -171,6 +179,18 @@ export default function MuscleWikiScreen({ route }: any) {
         setSelectedMuscles(prev => prev.includes(m) ? prev.filter(x => x !== m) : [...prev, m]);
     };
 
+    const saveKey = () => {
+        if (!apiKeyInput.trim()) {
+            showToast.error('Error', 'Please enter a valid API key');
+            return;
+        }
+        setMuscleWikiApiKey(apiKeyInput.trim());
+        setShowKeyModal(false);
+        showToast.success('Success', 'API Key saved!');
+        loadFilters();
+        if (results.length === 0) loadFirstPage();
+    };
+
     const renderResult = ({ item }: { item: MuscleWikiExerciseSummary }) => (
         <TouchableOpacity
             onPress={() => navigation.navigate('MuscleWikiDetail', { id: item.id })}
@@ -285,6 +305,43 @@ export default function MuscleWikiScreen({ route }: any) {
                     )}
                 </View>
             </View>
+            <Modal
+                visible={showKeyModal}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => {}} 
+            >
+                <KeyboardAvoidingView 
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', padding: 20 }}
+                >
+                    <View style={{ backgroundColor: '#1F2937', padding: 20, borderRadius: 16, borderColor: '#374151', borderWidth: 1 }}>
+                        <Text style={{ color: '#F9FAFB', fontSize: 20, fontWeight: 'bold', marginBottom: 12 }}>MuscleWiki API Key Required</Text>
+                        <Text style={{ color: '#D1D5DB', marginBottom: 16, lineHeight: 20 }}>
+                            To use the Wiki feature, you need to provide your own MuscleWiki API key.
+                        </Text>
+                        <TouchableOpacity onPress={() => Linking.openURL('https://rapidapi.com/musclewiki-sezc-musclewiki-sezc-default/api/musclewiki-api')}>
+                            <Text style={{ color: '#0EA5A4', marginBottom: 16, textDecorationLine: 'underline' }}>Get a free API key here</Text>
+                        </TouchableOpacity>
+                        
+                        <Text style={{ color: '#9CA3AF', marginBottom: 8, fontSize: 12 }}>Enter API Key:</Text>
+                        <TextInput 
+                            value={apiKeyInput}
+                            onChangeText={setApiKeyInput}
+                            placeholder="Paste your key here..."
+                            placeholderTextColor="#6B7280"
+                            style={{ backgroundColor: '#111827', color: '#F9FAFB', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#374151', marginBottom: 20 }}
+                        />
+                        
+                        <TouchableOpacity 
+                            onPress={saveKey}
+                            style={{ backgroundColor: '#0EA5A4', padding: 12, borderRadius: 8, alignItems: 'center' }}
+                        >
+                            <Text style={{ color: '#FFFFFF', fontWeight: 'bold' }}>Save Key</Text>
+                        </TouchableOpacity>
+                    </View>
+                </KeyboardAvoidingView>
+            </Modal>
         </SafeAreaView>
     );
 }
