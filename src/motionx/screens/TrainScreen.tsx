@@ -19,22 +19,19 @@ export default function TrainScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#0B0F14' }}>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100 }}>
-        <View style={{ paddingTop: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View>
-            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#F9FAFB', marginBottom: 6 }}>Training</Text>
-            <Text style={{ color: '#9CA3AF' }}>Manage your workouts</Text>
-          </View>
-          <TouchableOpacity 
-            onPress={() => setShowCreateModal(true)}
-            style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#0EA5A4', alignItems: 'center', justifyContent: 'center' }}
-          >
-             <MaterialCommunityIcons name="plus" size={24} color="#0B0F14" />
-          </TouchableOpacity>
+      <View style={{ paddingHorizontal: 16, paddingTop: 16, marginBottom: 8, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <View>
+          <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#F9FAFB', marginBottom: 6 }}>Training</Text>
+          <Text style={{ color: '#9CA3AF' }}>Manage your workouts</Text>
         </View>
-
-        <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#F9FAFB', marginTop: 24, marginBottom: 12 }}>My Workouts</Text>
-        
+        <TouchableOpacity
+          onPress={() => setShowCreateModal(true)}
+          style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: '#0EA5A4', alignItems: 'center', justifyContent: 'center' }}
+        >
+          <MaterialCommunityIcons name="plus" size={24} color="#0B0F14" />
+        </TouchableOpacity>
+      </View>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, paddingTop: 12 }}>
         {savedPlans.length === 0 ? (
           <View style={{ padding: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: '#111827', borderRadius: 16, borderWidth: 1, borderColor: '#1F2937' }}>
             <Text style={{ color: '#9CA3AF', marginBottom: 12 }}>No workouts created yet.</Text>
@@ -44,28 +41,28 @@ export default function TrainScreen() {
           </View>
         ) : (
           savedPlans.map(plan => (
-            <TouchableOpacity 
-              key={plan.id} 
+            <TouchableOpacity
+              key={plan.id}
               onPress={() => navigation.navigate('WorkoutPlan', { planId: plan.id })}
               style={{ padding: 16, borderRadius: 12, backgroundColor: '#111827', borderWidth: 1, borderColor: '#1F2937', marginBottom: 12 }}
             >
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                 <View>
-                    <Text style={{ color: '#F9FAFB', fontWeight: '600', fontSize: 16 }}>{plan.name}</Text>
-                    <Text style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
-                      {plan.exercises.length} Exercises
-                    </Text>
-                    {plan.exercises.length > 0 && (
-                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
-                         {[...new Set(plan.exercises.flatMap(e => e.bodyParts || []))].slice(0, 3).map(bp => (
-                           <View key={bp} style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, backgroundColor: '#1F2937' }}>
-                              <Text style={{ color: '#9CA3AF', fontSize: 10 }}>{bp}</Text>
-                           </View>
-                         ))}
-                      </View>
-                    )}
-                 </View>
-                 <MaterialCommunityIcons name="chevron-right" size={24} color="#4B5563" />
+                <View>
+                  <Text style={{ color: '#F9FAFB', fontWeight: '600', fontSize: 16 }}>{plan.name}</Text>
+                  <Text style={{ color: '#9CA3AF', fontSize: 12, marginTop: 4 }}>
+                    {plan.exercises.length} Exercises
+                  </Text>
+                  {plan.exercises.length > 0 && (
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
+                      {[...new Set(plan.exercises.flatMap(e => e.bodyParts || []))].slice(0, 3).map(bp => (
+                        <View key={bp} style={{ paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, backgroundColor: '#1F2937' }}>
+                          <Text style={{ color: '#9CA3AF', fontSize: 10 }}>{bp}</Text>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+                <MaterialCommunityIcons name="chevron-right" size={24} color="#4B5563" />
               </View>
             </TouchableOpacity>
           ))
@@ -86,13 +83,13 @@ export default function TrainScreen() {
               autoFocus
             />
             <View style={{ flexDirection: 'row', gap: 12 }}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={() => setShowCreateModal(false)}
                 style={{ flex: 1, height: 40, borderRadius: 8, backgroundColor: '#1F2937', alignItems: 'center', justifyContent: 'center' }}
               >
                 <Text style={{ color: '#F9FAFB' }}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 onPress={handleCreatePlan}
                 style={{ flex: 1, height: 40, borderRadius: 8, backgroundColor: '#0EA5A4', alignItems: 'center', justifyContent: 'center' }}
               >
