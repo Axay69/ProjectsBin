@@ -12,6 +12,7 @@ export default function MuscleWikiDetailScreen() {
   const id: number = route.params?.id;
 
   const [loading, setLoading] = useState(true);
+  const [videoLoading, setVideoLoading] = useState(true);
   const [detail, setDetail] = useState<MuscleWikiExerciseDetail | null>(null);
   const [videoIndex, setVideoIndex] = useState(0);
   const [videoPaths, setVideoPaths] = useState<string[]>([]);
@@ -22,11 +23,14 @@ export default function MuscleWikiDetailScreen() {
 
   const load = async () => {
     setLoading(true);
+    setVideoLoading(true);
     try {
       const d = await getExerciseDetail(id);
       console.log(d);
       
       setDetail(d);
+      setLoading(false);
+
       const urls = d.videos?.map(v => v.url) || [];
       if (urls.length) {
         const paths = await Promise.all(urls.map(u => cacheMuscleWikiVideo(u)));
@@ -38,6 +42,7 @@ export default function MuscleWikiDetailScreen() {
     } catch (e) {
     } finally {
       setLoading(false);
+      setVideoLoading(false);
     }
   };
 
@@ -63,29 +68,38 @@ export default function MuscleWikiDetailScreen() {
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ padding: 16 }}>
-          {detail.videos && detail.videos.length > 0 && videoPaths.length > 0 ? (
+          {detail.videos && detail.videos.length > 0 && (videoLoading || videoPaths.length > 0) ? (
             <View style={{ backgroundColor: '#0F172A', borderColor: '#1F2937', borderWidth: 1, borderRadius: 12, overflow: 'hidden' }}>
-              <Video
-                source={{ uri: videoPaths[videoIndex] }}
-                style={{ width: '100%', height: 220 }}
-                controls={false}
-                repeat={true}
-                muted={true}
-                resizeMode="contain"
-              />
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 8 }}>
-                <Text style={{ color: '#9CA3AF' }}>
-                  {detail.videos[videoIndex].gender ? detail.videos[videoIndex].gender : ''} {detail.videos[videoIndex].angle ? `• ${detail.videos[videoIndex].angle}` : ''}
-                </Text>
-                <View style={{ flexDirection: 'row' }}>
-                  <TouchableOpacity disabled={videoIndex <= 0} onPress={() => setVideoIndex(i => Math.max(0, i - 1))} style={{ padding: 6, opacity: videoIndex <= 0 ? 0.5 : 1 }}>
-                    <MaterialCommunityIcons name="chevron-left" size={24} color="#E5E7EB" />
-                  </TouchableOpacity>
-                  <TouchableOpacity disabled={videoIndex >= (detail.videos?.length || 1) - 1} onPress={() => setVideoIndex(i => Math.min((detail.videos?.length || 1) - 1, i + 1))} style={{ padding: 6, opacity: videoIndex >= (detail.videos?.length || 1) - 1 ? 0.5 : 1 }}>
-                    <MaterialCommunityIcons name="chevron-right" size={24} color="#E5E7EB" />
-                  </TouchableOpacity>
+              {videoLoading ? (
+                <View style={{ height: 220, alignItems: 'center', justifyContent: 'center' }}>
+                  <ActivityIndicator color="#0EA5A4" size="large" />
+                  <Text style={{ color: '#9CA3AF', marginTop: 8 }}>Loading video...</Text>
                 </View>
-              </View>
+              ) : (
+                <>
+                  <Video
+                    source={{ uri: videoPaths[videoIndex] }}
+                    style={{ width: '100%', height: 220 }}
+                    controls={false}
+                    repeat={true}
+                    muted={true}
+                    resizeMode="contain"
+                  />
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 8 }}>
+                    <Text style={{ color: '#9CA3AF' }}>
+                      {detail.videos[videoIndex].gender ? detail.videos[videoIndex].gender : ''} {detail.videos[videoIndex].angle ? `• ${detail.videos[videoIndex].angle}` : ''}
+                    </Text>
+                    <View style={{ flexDirection: 'row' }}>
+                      <TouchableOpacity disabled={videoIndex <= 0} onPress={() => setVideoIndex(i => Math.max(0, i - 1))} style={{ padding: 6, opacity: videoIndex <= 0 ? 0.5 : 1 }}>
+                        <MaterialCommunityIcons name="chevron-left" size={24} color="#E5E7EB" />
+                      </TouchableOpacity>
+                      <TouchableOpacity disabled={videoIndex >= (detail.videos?.length || 1) - 1} onPress={() => setVideoIndex(i => Math.min((detail.videos?.length || 1) - 1, i + 1))} style={{ padding: 6, opacity: videoIndex >= (detail.videos?.length || 1) - 1 ? 0.5 : 1 }}>
+                        <MaterialCommunityIcons name="chevron-right" size={24} color="#E5E7EB" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </>
+              )}
             </View>
           ) : null}
 

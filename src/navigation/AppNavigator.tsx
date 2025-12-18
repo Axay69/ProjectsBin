@@ -30,6 +30,7 @@ import MotiStateMachineButtonScreen from '../screens/MotiStateMachineButtonScree
 import MotiToastStackScreen from '../screens/MotiToastStackScreen';
 import MotiAnimatedTabBarScreen from '../screens/MotiAnimatedTabBarScreen';
 import SystemNavigationBarDemoScreen from '../screens/SystemNavigationBarDemoScreen';
+import Media3DemoScreen from '../screens/Media3DemoScreen';
 import XTHome from '../xtracker/screens/HomeScreen';
 import XTFriends from '../xtracker/screens/FriendsScreen';
 import XTProfile from '../xtracker/screens/ProfileScreen';
@@ -66,6 +67,8 @@ type RootStackParamList = {
   MotiStateMachineButton: undefined;
   MotiToastStack: undefined;
   MotiAnimatedTabBar: undefined;
+  NativeFFmpegDemo: undefined;
+  NativeMedia3Demo: undefined;
 };
 
 type XTHomeStackParamList = {
@@ -298,6 +301,10 @@ export default function AppNavigator() {
         <RootStack.Screen
           name="MotiAnimatedTabBar"
           component={MotiAnimatedTabBarScreen}
+        />
+        <RootStack.Screen
+          name="NativeMedia3Demo"
+          component={Media3DemoScreen}
         />
       </RootStack.Navigator>
     </NavigationContainer>

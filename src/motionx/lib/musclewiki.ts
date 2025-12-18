@@ -161,7 +161,7 @@ export async function search(q: string, offset: number = 0, limit: number = 50) 
 }
 
 export async function cacheMuscleWikiVideo(url: string) {
-  const key = muscleWikiApiKey || '';
+  const key = mmkv.getString('musclewiki_api_key') || muscleWikiApiKey || '';
   const safe = url.replace(/[^a-zA-Z0-9]/g, '_');
   const dir = RNFetchBlob.fs.dirs.CacheDir;
   const path = `${dir}/musclewiki_${safe}`;

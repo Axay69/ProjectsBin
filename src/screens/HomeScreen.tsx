@@ -36,6 +36,8 @@ type RootStackParamList = {
   MotiAnimatedTabBar: undefined;
   MotionX: undefined;
   SystemNavigationBarDemo: undefined;
+  NativeFFmpegDemo: undefined;
+  NativeMedia3Demo: undefined;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -179,6 +181,11 @@ export default function HomeScreen({ navigation }: Props) {
           title="MotionX"
           subtitle="Fitness App"
           onPress={() => navigation.navigate('MotionX')}
+        />
+        <TaskItem
+          title="Native Media3 Demo"
+          subtitle="Android Media3 editing (no FFmpeg)"
+          onPress={() => navigation.navigate('NativeMedia3Demo')}
         />
       </ScrollView>
     </View>

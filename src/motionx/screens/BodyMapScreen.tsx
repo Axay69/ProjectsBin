@@ -121,9 +121,9 @@ export default function BodyMapScreen() {
                   <Path
                     key={i}
                     d={d}
-                    fill={selectedPart === part.id ? '#0EA5A4' : '#374151'}
-                    stroke="#1F2937"
-                    strokeWidth="1"
+                    fill={selectedPart === part.id ? '#0056e1' : '#374151'}
+                    stroke={'#ffffffb6'}
+                    strokeWidth={"1"}
                   />
                 ))}
               </G>
