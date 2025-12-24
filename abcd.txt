@@ -1,0 +1,113 @@
+Currently, your logic is "Flat": UI calls Native Module, and the Native Module does one specific thing. To make this "Universal" and "Brutal-Efficient," we need a Pipeline Architecture where you define a recipe of edits, and the Native Module executes them in a single pass.
+
+Here is the strategic breakdown of how we will productize this.
+
+1. The "Media Engine" Concept (The "ABCD.txt" 2.0)
+To make this reusable, we need to separate the Intent (what to do) from the Implementation (how Media3 does it).
+
+Phase 1: The Request Model (Unified API)
+Instead of calling trim() then rotate(), we will pass an EditConfiguration object.
+
+Atomic Operations: Every edit (crop, speed, text) is an object.
+
+Single-Pass Rendering: Media3's Transformer is designed to apply a list of Effects. By sending a list of operations at once, we avoid re-encoding the video multiple times (which saves battery and prevents quality loss).
+
+Phase 2: The Validation Layer
+Boundary Checks: Ensure trimEnd isn't longer than video duration before the bridge is even crossed.
+
+Codec Safety: Automatically alignTo16 for dimensions so the Android hardware encoder doesn't crash on "odd" resolutions.
+
+2. Improved Native Architecture (The "Universal" Way)
+I have refactored your logic into a Task-Based System. Instead of 10 different methods, we create a primary processVideo method that accepts a JSON configuration.
+
+Updated NativeMedia3Module.kt (Core Logic)
+This approach allows you to chain everything: Trim + Speed + Overlay + Resolution in one single export job.
+
+Kotlin
+
+// Simplified logic for the "Universal" Processor
+@ReactMethod
+fun processVideo(inputUri: String, config: ReadableMap, promise: Promise) {
+    try {
+        val uri = toFileUri(inputUri)
+        val mediaItemBuilder = MediaItem.Builder().setUri(uri)
+        
+        // 1. Handle Clipping (Trim)
+        if (config.hasKey("trim")) {
+            val trim = config.getMap("trim")!!
+            mediaItemBuilder.setClippingConfiguration(
+                MediaItem.ClippingConfiguration.Builder()
+                    .setStartPositionMs(trim.getDouble("start").toLong())
+                    .setEndPositionMs(trim.getDouble("end").toLong())
+                    .build()
+            )
+        }
+
+        val videoEffects = mutableListOf<Effect>()
+        val audioProcessors = mutableListOf<AudioProcessor>()
+
+        // 2. Handle Speed
+        if (config.hasKey("speed")) {
+            val speedVal = config.getDouble("speed").toFloat()
+            videoEffects.add(SpeedChangeEffect(speedVal))
+            audioProcessors.add(SonicAudioProcessor().apply { setSpeed(speedVal); setPitch(1f) })
+        }
+
+        // 3. Handle Visuals (Rotate/Crop/Overlay)
+        // ... apply Presentation and OverlayEffect based on config ...
+
+        val editedMediaItem = EditedMediaItem.Builder(mediaItemBuilder.build())
+            .setEffects(Effects(audioProcessors, videoEffects))
+            .build()
+
+        // 4. Run Transformer (Single Pass!)
+        val transformer = Transformer.Builder(reactApplicationContext)
+            // ... listener and start ...
+            .build()
+            
+        transformer.start(editedMediaItem, outputFile("processed"))
+    } catch (e: Exception) {
+        promise.reject("PROCESS_ERROR", e.message)
+    }
+}
+
+3. The TypeScript SDK Layer (MediaEngine.ts)
+This is what you will copy-paste into any new app. It wraps the Native Module in a clean, typed interface.
+
+TypeScript
+
+// media-engine/index.ts
+
+export interface EditConfig {
+  trim?: { start: number; end: number };
+  speed?: number;
+  rotation?: 0 | 90 | 180 | 270;
+  compression?: 'HEVC_720P' | 'H264_1080P' | 'WHATSAPP';
+  overlay?: { text: string; x: number; y: number };
+}
+
+export const MediaEngine = {
+  /**
+   * The "Universal" method. Does everything in one re-encode.
+   */
+  process: async (uri: string, config: EditConfig): Promise<string> => {
+    // 1. Validation Logic
+    if (config.trim && config.trim.start >= config.trim.end) {
+      throw new Error("Trim start must be less than end");
+    }
+
+    // 2. Preset Mapping
+    const nativeConfig = {
+      ...config,
+      // Map 'WHATSAPP' to actual W/H/Bitrate values here
+    };
+
+    return NativeMedia3Module.processVideo(uri, nativeConfig);
+  },
+
+  /**
+   * Quick utility for common tasks
+   */
+  compressForSocial: (uri: string) => 
+    MediaEngine.process(uri, { compression: 'HEVC_720P', speed: 1.0 })
+};

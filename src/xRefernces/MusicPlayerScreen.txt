@@ -1,0 +1,980 @@
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  StatusBar,
+  ActivityIndicator,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {darkTheme} from '../theme/theme';
+import {useAudioPlayerStore} from '../store/playerStore';
+import Sound from 'react-native-sound';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import LinearGradient from 'react-native-linear-gradient';
+import {Slider} from 'react-native-awesome-slider';
+import {useSharedValue} from 'react-native-reanimated';
+import MarqueeText from '@react-native-oh-tpl/react-native-marquee';
+import ShimmerPlaceHolder from 'react-native-shimmer-placeholder';
+import {getAllSwatches} from 'react-native-palette';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {createPlaylist, addTrackToPlaylist, initDB} from '../services/db';
+// import PictureInPicture from '@jaydhimar/react-native-pip';
+// import moduleName from 'react-native-picture-in-picture';
+
+const {width} = Dimensions.get('window');
+
+const MusicPlayerScreen = () => {
+  const navigation = useNavigation();
+  const {
+    currentTrack,
+    audioFiles,
+    isPlaying,
+    play,
+    pause,
+    soundRef,
+    setSoundRef,
+    setTrack,
+  } = useAudioPlayerStore();
+  const [currentIndex, setCurrentIndex] = useState(
+    audioFiles.findIndex(f => f.path === (currentTrack?.path || '')),
+  );
+  const [duration, setDuration] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [progressValue, setProgressValue] = useState(0);
+  const [isFav, setIsFav] = useState(false);
+
+  const min = useSharedValue(0);
+  const max = useSharedValue(100);
+  const progress = useSharedValue(0);
+
+  const isSlidingRef = useRef(false);
+  const alreadyPressedRef = useRef(false);
+  useEffect(() => {
+    if (!audioFiles.length || currentIndex === -1) return;
+    const track = audioFiles[currentIndex];
+    if (!track) return;
+    setLoading(true);
+
+    // console.log('sound', soundRef.current);
+
+    const sound2 = new Sound(track.path, '', error => {
+      if (error) {
+        return;
+      }
+
+      // console.log(sound2);
+      max.value = sound2.getDuration();
+      setDuration(sound2.getDuration());
+      sound2.release();
+    });
+
+    if (!soundRef.current || soundRef.current._filename !== track.path) {
+      if (soundRef.current) {
+        soundRef.current.stop();
+        soundRef.current.release();
+      }
+      const sound = new Sound(track.path, '', error => {
+        if (error) {
+          setTimeout(() => {
+            setLoading(false);
+          }, 0);
+          return;
+        }
+
+        // console.log(sound);
+
+        setDuration(sound.getDuration());
+        setTimeout(() => {
+          setLoading(false);
+        }, 0);
+        // Do not autoplay, just set up the sound instance
+      });
+      soundRef.current = sound;
+      setSoundRef(sound);
+    } else {
+      // let durationx = soundRef.current.getDuration();
+      // max.value = durationx;
+      // setDuration(durationx);
+      setTimeout(() => {
+        setLoading(false);
+      }, 0);
+    }
+
+    // console.log(currentTrack.coverPalette);
+
+    return () => {};
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, audioFiles]);
+
+  // Keep progress in sync if playing
+  useEffect(() => {
+    let interval;
+    if (soundRef.current && isPlaying) {
+      interval = setInterval(() => {
+        soundRef.current.getCurrentTime(sec => {
+          if (!isSlidingRef.current) progress.value = sec;
+          setProgressValue(sec);
+        });
+      }, 500);
+    } else {
+      // If not playing, just set progress once
+      if (soundRef.current) {
+        soundRef.current.getCurrentTime(sec => {
+          if (!isSlidingRef.current) progress.value = sec;
+          setProgressValue(sec);
+        });
+      }
+    }
+    return () => {
+      interval && clearInterval(interval);
+    };
+  }, [isPlaying, soundRef.current]);
+
+  // Initialize DB on mount
+  useEffect(() => {
+    initDB();
+  }, []);
+
+  const formatTime = sec => {
+    if (!sec && sec !== 0) return '0:00';
+    const mins = Math.floor(sec / 60);
+    const secs = Math.floor(sec % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  const track = audioFiles[currentIndex];
+  if (!track) return <View style={styles.screen} />;
+
+  // Use coverPalette for background gradient, fallback to theme default
+  const gradientColors =
+    track.coverPalette && track.coverPalette.length > 0
+      ? track.coverPalette
+      : darkTheme.defaultCoverPalette;
+
+  // Play/Pause handler
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
+  };
+
+  useEffect(() => {
+    if (!duration || duration < 1) {
+      return;
+    }
+    if (Math.floor(progressValue) >= Math.floor(duration) && isPlaying) {
+      handleNext();
+    }
+  }, [progressValue]);
+
+  // Next track handler
+  const handleNext = () => {
+    if (alreadyPressedRef.current) return;
+    alreadyPressedRef.current = true;
+    setTimeout(() => {
+      alreadyPressedRef.current = false;
+    }, 400);
+
+    if (!audioFiles.length) return;
+
+    setLoading(true);
+
+    const nextIndex = (currentIndex + 1) % audioFiles.length;
+    setCurrentIndex(nextIndex);
+    setTrack(audioFiles[nextIndex]);
+  };
+
+  // Previous track handler
+  const handlePrev = () => {
+    if (alreadyPressedRef.current) return;
+    alreadyPressedRef.current = true;
+    setTimeout(() => {
+      alreadyPressedRef.current = false;
+    }, 2000);
+    if (!audioFiles.length) return;
+
+    setLoading(true);
+    const prevIndex =
+      (currentIndex - 1 + audioFiles.length) % audioFiles.length;
+    setCurrentIndex(prevIndex);
+    setTrack(audioFiles[prevIndex]);
+  };
+
+  // if (loading) {
+  //   return (
+  //     <View style={styles.absoluteScreen}>
+  //       <StatusBar
+  //         backgroundColor={darkTheme.colors.background}
+  //         barStyle="light-content"
+  //       />
+  //     </View>
+  //   );
+  // }
+
+  return (
+    <View style={styles.absoluteScreen}>
+      <LinearGradient
+        colors={[
+          // gradientColors[0],
+          currentTrack.cover ? gradientColors[1] : gradientColors[0],
+          gradientColors[1],
+          darkTheme.colors.background,
+          darkTheme.colors.background,
+          darkTheme.colors.background,
+          // '#fff',
+          // '#fff',
+        ]}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+        start={{x: 0, y: 0}}
+        end={{x: 0, y: 1}}
+      />
+      <StatusBar
+        backgroundColor={darkTheme.colors.background}
+        barStyle="light-content"
+        translucent={false}
+      />
+      {/* Top Bar */}
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          style={[styles.topBtn, {elevation: 15}]}
+          onPress={() => navigation.goBack()}>
+          <Icon
+            name="chevron-down"
+            size={32}
+            style={styles.textShadow}
+            color={darkTheme.colors.primary}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.topBtn}>
+          <Icon
+            name="dots-vertical"
+            size={28}
+            style={styles.textShadow}
+            color={darkTheme.colors.primary}
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Middle: Cover Art, Title, Artist */}
+      <View style={styles.middleSection}>
+        <View style={styles.coverContainer}>
+          <Image
+            source={
+              track.cover &&
+              typeof track.cover === 'string' &&
+              track.cover.length > 0
+                ? {uri: track.cover}
+                : require('../assets/images/logo_placeholder.png')
+            }
+            onLoadEnd={() => {}}
+            style={styles.cover}
+          />
+        </View>
+        {/* Ticker Title */}
+        <View style={styles.marqueeContainer}>
+          {loading ? (
+            <Text style={[styles.title, styles.textShadow]}>Loading...</Text>
+          ) : (
+            // <Text style={styles.title}>Loading...</Text>
+
+            <MarqueeText
+              key={track.title}
+              style={[styles.title, styles.textShadow]}
+              speed={0.3}
+              marqueeOnStart={true}
+              loop={true}
+              consecutive={false}
+              delay={1000}>
+              {track.title}
+            </MarqueeText>
+          )}
+        </View>
+        {/* Ticker Artist */}
+        <View
+          style={{
+            width: width * 0.9,
+            marginBottom: 2,
+            alignSelf: 'center',
+          }}>
+          {loading ? (
+            <Text style={[styles.artist, styles.textShadow]}> </Text>
+          ) : (
+            <Text
+              key={track.artist}
+              style={[styles.artist, styles.textShadow]}
+              numberOfLines={2}>
+              {track.artist ? track.artist : ''}
+            </Text>
+          )}
+        </View>
+      </View>
+
+      {/* Floating corner buttons */}
+      {/* Removed absolute positioning for corner buttons */}
+
+      {/* Bottom: Time, Slider, Controls */}
+      <View style={styles.bottomSection}>
+        <View style={styles.timeRow}>
+          <Text style={[styles.time, styles.textShadow]}>
+            {loading ? '0:00' : formatTime(progressValue)}
+          </Text>
+          <Slider
+            minimumValue={min}
+            maximumValue={max}
+            progress={progress}
+            theme={{
+              minimumTrackTintColor: darkTheme.colors.primary,
+              bubbleBackgroundColor: darkTheme.colors.primary,
+              bubbleTextColor: darkTheme.colors.text,
+              heartbeatColor: '#453d3c90',
+              maximumTrackTintColor: '#9d9c9c89',
+            }}
+            onSlidingStart={v => {
+              isSlidingRef.current = true;
+            }}
+            style={{}}
+            onSlidingComplete={v => {
+              isSlidingRef.current = false;
+              soundRef.current.setCurrentTime(parseInt(v.toFixed(1)));
+              setProgressValue(v);
+              if (
+                Math.floor(progressValue) >= Math.floor(duration - 2) &&
+                isPlaying
+              ) {
+                handleNext();
+              }
+            }}
+            onValueChange={v => {}}
+            bubble={sec => formatTime(sec)}
+            containerStyle={{borderRadius: 20}}
+            heartbeat={true}
+          />
+          <Text style={[styles.time, styles.textShadow]}>
+            {loading ? '0:00' : formatTime(duration)}
+          </Text>
+        </View>
+        <View style={styles.controls}>
+          <TouchableOpacity
+            style={styles.controlBtn}
+            onPress={() => {
+              // PictureInPicture.isPipSupported().then(supported => {
+              //   console.log('PIP supported:', supported);
+              //   if (supported) {
+              //     PictureInPicture.enterPictureInPicture({
+              //       aspectRatio: {height: 9, width: 9},
+              //       autoEnterOnBackground: true,
+              //     });
+              //   } else {
+              //     console.log('PIP not supported');
+              //   }
+              // });
+            }}>
+            <Icon
+              name="playlist-plus"
+              size={28}
+              style={styles.textShadow}
+              color={darkTheme.colors.primary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.controlBtn} onPress={handlePrev}>
+            <Icon
+              name="skip-previous"
+              size={38}
+              style={styles.textShadow}
+              color={darkTheme.colors.primary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.controlBtn} onPress={handlePlayPause}>
+            <Icon
+              name={isPlaying ? 'pause-circle' : 'play-circle'}
+              size={54}
+              style={styles.textShadow}
+              color={darkTheme.colors.primary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.controlBtn} onPress={handleNext}>
+            <Icon
+              name="skip-next"
+              size={38}
+              style={styles.textShadow}
+              color={darkTheme.colors.primary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.controlBtn}
+            onPress={async () => {
+              if (!track) return;
+              try {
+                await createPlaylist('Favourite');
+                await addTrackToPlaylist('Favourite', track);
+                setIsFav(true);
+              } catch (e) {
+                // Optionally show error feedback
+                console.log('Error adding to Favourite:', e);
+              }
+            }}>
+            <Icon
+              name={isFav ? 'heart' : 'heart-outline'}
+              size={28}
+              style={styles.textShadow}
+              color={darkTheme.colors.primary}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  absoluteScreen: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+
+    backgroundColor: darkTheme.colors.background,
+    alignItems: 'center',
+    paddingTop: 16,
+    zIndex: 999,
+  },
+  screen: {
+    flex: 1,
+    backgroundColor: darkTheme.colors.background,
+    alignItems: 'center',
+    paddingTop: 16,
+  },
+  topBar: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 8,
+  },
+  topBtn: {
+    padding: 8,
+  },
+  middleSection: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  musicBtn: {
+    marginHorizontal: 18,
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+  },
+  bottomSection: {
+    width: '100%',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 32,
+    left: 0,
+    right: 0,
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    zIndex: 10,
+    backgroundColor: 'transparent',
+  },
+  coverContainer: {
+    width: width * 0.8,
+    height: width * 0.8,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 24,
+    backgroundColor: darkTheme.colors.surface,
+    marginTop: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 10,
+  },
+  cover: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 16,
+  },
+  shimmerTitle: {
+    width: width * 0.5,
+    height: 22,
+    borderRadius: 6,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  shimmerMeta: {
+    width: width * 0.3,
+    height: 16,
+    borderRadius: 4,
+    marginBottom: 16,
+  },
+  shimmerTime: {
+    width: 40,
+    height: 12,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  shimmerSlider: {
+    width: 100,
+    height: 12,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  title: {
+    color: darkTheme.colors.primary,
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginTop: 8,
+    textAlign: 'center',
+    minWidth: '100%',
+    alignSelf: 'center',
+  },
+  artist: {
+    color: darkTheme.colors.onSurface,
+    fontSize: 16,
+    marginTop: 2,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  timeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginVertical: 16,
+    paddingHorizontal: 16,
+  },
+  time: {
+    color: darkTheme.colors.onSurface,
+    fontSize: 14,
+    width: 60,
+    textAlign: 'center',
+  },
+  controls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    marginTop: 16,
+    width: '100%',
+  },
+  controlBtn: {
+    // marginHorizontal: 12,
+  },
+  marqueeContainer: {
+    marginHorizontal: 32,
+    marginBottom: 2,
+    alignSelf: 'center',
+  },
+  textShadow: {
+    textShadowColor: '#000000a1',
+    textShadowRadius: 8,
+  },
+});
+
+export default MusicPlayerScreen;
+
+
+=======+
+import {create} from 'zustand';
+
+const globalSoundRef = {current: null};
+
+export const useAudioPlayerStore = create((set, get) => ({
+  audioFiles: [], // array of all tracks
+  currentTrack: null, // { title, artist, album, cover, path }
+  currentIndex: -1,
+  isPlaying: false,
+  soundRef: globalSoundRef,
+  setAudioFiles: files => set({audioFiles: files}),
+  setCurrentIndex: idx => {
+    const files = get().audioFiles;
+    set({
+      currentIndex: idx,
+      currentTrack: files[idx] || null,
+      isPlaying: files[idx] ? true : false,
+    });
+  },
+  setTrack: track => {
+    const files = get().audioFiles;
+    const idx = files.findIndex(f => f.path === track.path);
+    set({
+      currentTrack: track,
+      currentIndex: idx,
+      isPlaying: true,
+    });
+  },
+  play: () => set(state => ({isPlaying: true})),
+  pause: () => set(state => ({isPlaying: false})),
+  stop: () => set({currentTrack: null, currentIndex: -1, isPlaying: false}),
+  setSoundRef: ref => {
+    globalSoundRef.current = ref;
+  },
+  getSoundRef: () => globalSoundRef.current,
+}));
+=========+
+import React from 'react';
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {darkTheme} from '../theme/theme';
+import {useAudioPlayerStore} from '../store/playerStore';
+import {useDiscoverPlayerStore} from '../store/discoverPlayerStore';
+
+const MusicCard = ({audio}) => {
+  const setTrack = useAudioPlayerStore(state => state.setTrack);
+  const discoverPlayer = useDiscoverPlayerStore();
+
+  const handlePress = () => {
+    // If discover player is playing, stop and release it first
+    if (discoverPlayer.currentTrack) {
+      if (discoverPlayer.soundRef.current) {
+        discoverPlayer.soundRef.current.stop();
+        discoverPlayer.soundRef.current.release();
+        discoverPlayer.setSoundRef(null);
+      }
+      discoverPlayer.stop();
+      // discoverPlayer.setTrack(null);
+    }
+    setTrack(audio);
+  };
+
+  return (
+    <TouchableOpacity
+      style={styles.card}
+      onPress={handlePress}
+      activeOpacity={0.8}>
+      <View style={styles.coverPlaceholder}>
+        <Image
+          source={
+            audio.cover
+              ? {uri: audio.cover}
+              : require('../assets/images/logo_placeholder.png')
+          }
+          style={styles.coverImage}
+          resizeMode="cover"
+        />
+      </View>
+      <View style={styles.info}>
+        <Text style={styles.title} numberOfLines={1}>
+          {audio.title}
+        </Text>
+        {audio.artist ? (
+          <Text style={styles.meta} numberOfLines={1}>
+            {audio.artist}
+          </Text>
+        ) : null}
+        {audio.album ? (
+          <Text style={styles.meta} numberOfLines={1}>
+            {audio.album}
+          </Text>
+        ) : null}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // backgroundColor: darkTheme.colors.surface,
+    borderRadius: 10,
+    // backgroundColor: 'red',
+    marginBottom: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    elevation: 2,
+  },
+  coverPlaceholder: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: darkTheme.colors.background,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    overflow: 'hidden',
+  },
+  coverImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: 'black',
+  },
+  info: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  title: {
+    color: darkTheme.colors.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  meta: {
+    color: darkTheme.colors.onSurface,
+    fontSize: 12,
+    marginTop: 2,
+  },
+});
+
+export default MusicCard;
+===============++
+import React, {useEffect, useRef, useState} from 'react';
+import {View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {darkTheme} from '../theme/theme';
+import {useAudioPlayerStore} from '../store/playerStore';
+import Sound from 'react-native-sound';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MarqueeText from '@react-native-oh-tpl/react-native-marquee';
+import LinearGradient from 'react-native-linear-gradient';
+Sound.setCategory('Playback');
+
+const MiniPlayer = () => {
+  const navigation = useNavigation();
+  const {
+    currentTrack,
+    isPlaying,
+    play,
+    pause,
+    soundRef,
+    setSoundRef,
+    getSoundRef,
+  } = useAudioPlayerStore();
+
+  useEffect(() => {
+    if (!currentTrack) {
+      if (soundRef.current) {
+        soundRef.current.stop();
+        soundRef.current.release();
+        soundRef.current = null;
+        setSoundRef(null);
+      }
+      return;
+    }
+    // Only create a new Sound instance if the track changes
+    if (!soundRef.current || soundRef.current._filename !== currentTrack.path) {
+      if (soundRef.current) {
+        soundRef.current.stop();
+        soundRef.current.release();
+      }
+      const sound = new Sound(currentTrack.path, '', error => {
+        if (error) {
+          pause();
+          return;
+        }
+        if (isPlaying) {
+          sound.play();
+        }
+      });
+      soundRef.current = sound;
+      setSoundRef(sound);
+    }
+    // Do not reset position if already playing
+    return () => {};
+  }, [currentTrack]);
+
+  useEffect(() => {
+    if (!soundRef.current) return;
+    if (isPlaying) {
+      soundRef.current.play();
+    } else {
+      soundRef.current.pause();
+    }
+  }, [isPlaying]);
+
+  if (!currentTrack) return null;
+
+  const handlePlayPause = e => {
+    e.stopPropagation();
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
+  };
+
+  const handleOpenPlayer = () => {
+    navigation.navigate('MusicPlayerScreen');
+  };
+
+  console.log(currentTrack);
+
+  const LinearGradientColors = currentTrack.cover
+    ? [
+        // currentTrack.coverPalette[0],
+        currentTrack.coverPalette[1],
+        // currentTrack.coverPalette[1],
+        // currentTrack.coverPalette[1],
+        // currentTrack.coverPalette[2],
+        '#00000000',
+        '#0000004b',
+        darkTheme.colors.background,
+        darkTheme.colors.background,
+        darkTheme.colors.background,
+      ]
+    : [darkTheme.colors.backgroundSupport, darkTheme.colors.background];
+  const [isFav, setIsFav] = useState(false);
+
+  return (
+    <TouchableOpacity
+      style={styles.container}
+      activeOpacity={0.9}
+      onPress={handleOpenPlayer}>
+      <LinearGradient
+        colors={LinearGradientColors}
+        style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+        start={{x: 0, y: 1}}
+        end={{x: 1, y: 1}}
+      />
+      <Image
+        source={
+          currentTrack.cover &&
+          typeof currentTrack.cover === 'string' &&
+          currentTrack.cover.length > 0
+            ? {uri: currentTrack.cover}
+            : require('../assets/images/logo_placeholder.png')
+        }
+        style={styles.cover}
+      />
+      <View style={styles.info}>
+        <LinearGradient
+          style={{
+            position: 'absolute',
+            end: 0,
+            width: 20,
+            height: 80,
+            zIndex: 1,
+          }}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 0}}
+          colors={['#00000000', darkTheme.colors.background]}
+        />
+        <MarqueeText
+          key={currentTrack.title}
+          style={[styles.title, styles.textShadow]}
+          speed={0.3}
+          marqueeOnStart={true}
+          loop={true}
+          consecutive={false}
+          delay={2000}>
+          {currentTrack.title}
+        </MarqueeText>
+        {currentTrack.artist ? (
+          <Text
+            style={[styles.artist, styles.textShadow]}
+            ellipsizeMode="tail"
+            numberOfLines={1}>
+            {currentTrack.artist}
+          </Text>
+        ) : null}
+      </View>
+      <View style={styles.controlsRow}>
+        {/* <TouchableOpacity
+          onPress={e => {
+            e.stopPropagation();
+            setIsFav(f => !f);
+          }}
+          style={styles.button}
+          activeOpacity={0.7}>
+          <Icon
+            name={isFav ? 'heart' : 'heart-outline'}
+            size={24}
+            style={styles.textShadow}
+            color={darkTheme.colors.primary}
+          />
+        </TouchableOpacity> */}
+        <TouchableOpacity
+          onPress={handlePlayPause}
+          style={styles.button}
+          activeOpacity={0.7}>
+          <Icon
+            name={isPlaying ? 'pause-circle' : 'play-circle'}
+            size={38}
+            style={styles.textShadow}
+            color={darkTheme.colors.primary}
+          />
+        </TouchableOpacity>
+        {/* <TouchableOpacity
+          onPress={e => {
+            e.stopPropagation();
+            navigation.navigate('MusicPlayerScreen');
+            // Optionally, trigger next track logic here if desired
+          }}
+          style={styles.button}
+          activeOpacity={0.7}>
+          <Icon
+            name="skip-next"
+            size={30}
+            style={styles.textShadow}
+            color={darkTheme.colors.primary}
+          />
+        </TouchableOpacity> */}
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: darkTheme.colors.surface,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    padding: 8,
+    paddingHorizontal: 16,
+    elevation: 8,
+    zIndex: 100,
+    minHeight: 64,
+    overflow: 'hidden',
+  },
+  cover: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    backgroundColor: darkTheme.colors.background,
+    zIndex: 1,
+    elevation: 8,
+  },
+  info: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
+  title: {
+    color: darkTheme.colors.primary,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  artist: {
+    color: darkTheme.colors.onSurface,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  button: {
+    zIndex: 1,
+    padding: 6,
+  },
+  textShadow: {
+    textShadowColor: 'rgba(0, 0, 0, 0.6)',
+    textShadowRadius: 8,
+  },
+  controlsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 4,
+    zIndex: 1,
+  },
+});
+
+export default MiniPlayer;

@@ -4,10 +4,8 @@ import {
   View,
   Text,
   ScrollView,
-  NativeModules,
   TextInput,
   Alert,
-  ActivityIndicator,
   TouchableOpacity,
   Switch,
   Platform,
@@ -18,8 +16,7 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 import RNFetchBlob from 'rn-fetch-blob';
 import Video from 'react-native-video';
-
-const { NativeMedia3Module } = NativeModules as any;
+import { MediaEngine, EditConfig } from '../lib/MediaEngine';
 
 export default function Media3DemoScreen() {
   const [singleVideo, setSingleVideo] = useState<string | null>(null);
@@ -40,133 +37,139 @@ export default function Media3DemoScreen() {
   const [extractTime, setExtractTime] = useState('1000');
   const [cropVals, setCropVals] = useState('0,0,500,500'); // x,y,w,h
 
-  const runTextOverlay = async () => {
-    if (!singleVideo) {
-       Alert.alert('Missing video', 'Please pick a video first.');
-       return;
-    }
-    setLogs('Adding Text Overlay...');
+  // Helper to handle MediaEngine calls
+  const runEngineOp = async (name: string, op: () => Promise<string>) => {
+    setLogs(`${name}...`);
     setStatus('Processing');
     setBusy(true);
     try {
-      // Hardcoded pos (100, 200) for demo, user can change time range in trim inputs or we can add new ones
-      // Using trimStart/trimEnd for overlay duration
-      const out = await NativeMedia3Module.addTextOverlay(
-        singleVideo, 
-        overlayText, 
-        100, 
-        200, 
-        Number(trimStart), 
-        Number(trimEnd)
-      );
-      setLogs(`Overlay complete\nOutput: ${out}`);
+      const out = await op();
+      setLogs(`${name} complete\nOutput: ${out}`);
       setStatus('Completed');
       setOutputUri(out);
-      setBusy(false);
     } catch (e: any) {
       console.error(e);
       setLogs(`Error: ${e.message}`);
       setStatus('Failed');
+    } finally {
       setBusy(false);
     }
   };
 
-  const runRotate = async () => {
-    if (!singleVideo) {
-       Alert.alert('Missing video', 'Please pick a video first.');
-       return;
-    }
-    setLogs(`Rotating ${rotateDeg} degrees...`);
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      const out = await NativeMedia3Module.rotate(singleVideo, Number(rotateDeg));
-      setLogs(`Rotation complete\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
+  const runTextOverlay = () => {
+    if (!singleVideo) return Alert.alert('Missing video');
+    // Note: Universal processVideo applies overlay to the whole duration currently
+    runEngineOp('Adding Text Overlay', () => 
+      MediaEngine.process(singleVideo, {
+        overlay: { text: overlayText, x: 100, y: 200 }
+      })
+    );
   };
 
-  const runFlip = async (horizontal: boolean, vertical: boolean) => {
-    if (!singleVideo) {
-       Alert.alert('Missing video', 'Please pick a video first.');
-       return;
-    }
-    setLogs(`Flipping ${horizontal ? 'Horizontal' : ''} ${vertical ? 'Vertical' : ''}...`);
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      const out = await NativeMedia3Module.flip(singleVideo, horizontal, vertical);
-      setLogs(`Flip complete\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
+  const runRotate = () => {
+    if (!singleVideo) return Alert.alert('Missing video');
+    runEngineOp(`Rotating ${rotateDeg}°`, () => 
+      MediaEngine.process(singleVideo, {
+        rotation: Number(rotateDeg)
+      })
+    );
   };
 
-  const runCrop = async () => {
-    if (!singleVideo) {
-       Alert.alert('Missing video', 'Please pick a video first.');
-       return;
-    }
+  const runFlip = (horizontal: boolean, vertical: boolean) => {
+    if (!singleVideo) return Alert.alert('Missing video');
+    runEngineOp(`Flipping ${horizontal ? 'H' : ''}${vertical ? 'V' : ''}`, () => 
+      MediaEngine.process(singleVideo, {
+        flip: { horizontal, vertical }
+      })
+    );
+  };
+
+  const runCrop = () => {
+    if (!singleVideo) return Alert.alert('Missing video');
     const [x, y, w, h] = cropVals.split(',').map(Number);
-    if (isNaN(x) || isNaN(y) || isNaN(w) || isNaN(h)) {
-      Alert.alert('Invalid crop', 'Format: x,y,w,h');
-      return;
-    }
+    if (isNaN(x)) return Alert.alert('Invalid crop');
     
-    setLogs(`Cropping to ${w}x${h} at (${x},${y})...`);
-    setStatus('Processing');
-    setBusy(true);
+    runEngineOp(`Cropping to ${w}x${h}`, () => 
+      MediaEngine.process(singleVideo, {
+        crop: { left: x, top: y, right: x + w, bottom: y + h }
+      })
+    );
+  };
+
+  const runExtractFrame = () => {
+    if (!singleVideo) return Alert.alert('Missing video');
+    runEngineOp('Extracting frame', () => 
+      MediaEngine.extractFrame(singleVideo, Number(extractTime))
+    );
+  };
+
+  const runTrim = () => {
+    if (!singleVideo) return Alert.alert('Missing video');
+    runEngineOp('Trimming', () => 
+      MediaEngine.process(singleVideo, {
+        trim: { start: Number(trimStart), end: Number(trimEnd) }
+      })
+    );
+  };
+
+  const runSpeed = () => {
+    if (!singleVideo) return Alert.alert('Missing video');
+    runEngineOp('Changing speed', () => 
+      MediaEngine.process(singleVideo, {
+        speed: Number(speed)
+        // preservePitch is handled by default in native or we can add to config if needed
+      })
+    );
+  };
+
+  const runMergeSideBySide = () => {
+    if (!videoA || !videoB) return Alert.alert('Missing videos');
+    runEngineOp('Merging Side-by-Side', () => 
+      MediaEngine.merge(videoA, videoB, 'side-by-side')
+    );
+  };
+
+  const runMergeTopBottom = () => {
+    if (!videoA || !videoB) return Alert.alert('Missing videos');
+    runEngineOp('Merging Top-Bottom', () => 
+      MediaEngine.merge(videoA, videoB, 'top-bottom')
+    );
+  };
+
+  const runCut = () => {
+    if (!singleVideo) return Alert.alert('Missing video');
+    runEngineOp('Cutting (removing middle)', () => 
+      MediaEngine.cut(singleVideo, Number(trimStart), Number(trimEnd))
+    );
+  };
+
+  const runImageToVideo = async () => {
+    if (!singleVideo) return Alert.alert('Missing image', 'Please pick an image (using same picker for now).');
     try {
-      // Native expects left, top, right, bottom (coords, not dimensions for right/bottom)
-      // Right = x + w, Bottom = y + h
-      const out = await NativeMedia3Module.crop(singleVideo, x, y, x + w, y + h);
-      setLogs(`Crop complete\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
+      setBusy(true);
+      const res = await launchImageLibrary({ mediaType: 'photo', quality: 1, selectionLimit: 1 });
+      const inputImg = res.assets?.[0];
+      if (!inputImg?.uri) {
+        setBusy(false);
+        return;
+      }
+      runEngineOp('Img -> Vid', () => MediaEngine.imageToVideo(inputImg.uri!, 5000));
     } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
       setBusy(false);
+      Alert.alert('Error', e.message);
     }
   };
 
-  const runExtractFrame = async () => {
-    if (!singleVideo) {
-       Alert.alert('Missing video', 'Please pick a video first.');
-       return;
-    }
-    setLogs(`Extracting frame at ${extractTime}ms...`);
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      const out = await NativeMedia3Module.extractFrame(singleVideo, Number(extractTime));
-      setLogs(`Frame extracted\nPath: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out); // Will display image in preview if supported or just log
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
+  const runTranscode = () => {
+    if (!singleVideo) return Alert.alert('Missing video');
+    runEngineOp('Compressing (720p)', () => 
+      MediaEngine.process(singleVideo, {
+        compression: 'HEVC_720P'
+      })
+    );
   };
 
+  // --- File Helpers ---
   const ensureLocalFile = async (uri: string) => {
     const fileLike = uri.startsWith('file://');
     const srcPath = fileLike ? uri.replace('file://', '') : uri;
@@ -184,220 +187,30 @@ export default function Media3DemoScreen() {
     }
   };
 
-  const pickVideoSingle = async () => {
+  const pickVideo = async (setter: (uri: string | null) => void) => {
     try {
       const res = await launchImageLibrary({ mediaType: 'video', selectionLimit: 1, quality: 0.5 });
       const asset = res.assets?.[0];
-      if (!asset || !asset.uri) return;
+      if (!asset?.uri) return;
       const local = await ensureLocalFile(asset.uri);
-      setSingleVideo(local);
+      setter(local);
     } catch (e: any) {
       Alert.alert('Pick failed', e.message);
     }
   };
-
-  const pickVideo = async (target: 'A' | 'B') => {
-    try {
-      const res = await launchImageLibrary({ mediaType: 'video', selectionLimit: 1, quality: 0.5 });
-      const asset = res.assets?.[0];
-      if (!asset || !asset.uri) return;
-      const local = await ensureLocalFile(asset.uri);
-      if (target === 'A') setVideoA(local);
-      else setVideoB(local);
-    } catch (e: any) {
-      Alert.alert('Pick failed', e.message);
-    }
-  };
-
-  const runTrim = async () => {
-    if (!singleVideo) {
-      Alert.alert('Missing video', 'Please pick a video first.');
-      return;
-    }
-    if (!NativeMedia3Module) {
-      setLogs('NativeMedia3Module is not available. Please run on Android and ensure the native module is linked.');
-      return;
-    }
-    setLogs('Trimming...');
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      const out = await NativeMedia3Module.trim(singleVideo, Number(trimStart), Number(trimEnd));
-      setLogs(`Trim completed\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
-  };
-
-  const runSpeed = async () => {
-    if (!singleVideo) {
-      Alert.alert('Missing video', 'Please pick a video first.');
-      return;
-    }
-    if (!NativeMedia3Module) {
-      setLogs('NativeMedia3Module is not available. Please run on Android and ensure the native module is linked.');
-      return;
-    }
-    setLogs('Changing speed...');
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      const s = Number(speed);
-      const out = await NativeMedia3Module.changeSpeed(singleVideo, s, preservePitch);
-      setLogs(`Speed change completed\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
-  };
-
-  const runMergeSideBySide = async () => {
-    if (!videoA || !videoB) {
-      Alert.alert('Missing videos', 'Please pick video A and video B.');
-      return;
-    }
-    if (!NativeMedia3Module) return;
-    setLogs('Merging Side-by-Side...');
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      const out = await NativeMedia3Module.mergeSideBySide(videoA, videoB);
-      setLogs(`Merge complete\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
-  };
-
-  const runMergeTopBottom = async () => {
-    if (!videoA || !videoB) {
-      Alert.alert('Missing videos', 'Please pick video A and video B.');
-      return;
-    }
-    if (!NativeMedia3Module) return;
-    setLogs('Merging Top-Bottom...');
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      const out = await NativeMedia3Module.mergeTopBottom(videoA, videoB);
-      setLogs(`Merge complete\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
-  };
-
-  const runCut = async () => {
-    if (!singleVideo) {
-      Alert.alert('Missing video', 'Please pick a video first.');
-      return;
-    }
-    setLogs('Cutting (removing middle part)...');
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      // Cut removes the part between start and end
-      const out = await NativeMedia3Module.cut(singleVideo, Number(trimStart), Number(trimEnd));
-      setLogs(`Cut complete\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
-  };
-
-  const runImageToVideo = async () => {
-    if (!singleVideo) { // Reusing singleVideo for image input
-       Alert.alert('Missing image', 'Please pick an image (using same picker for now).');
-       return;
-    }
-    setLogs('Converting Image to Video...');
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      const res = await launchImageLibrary({ mediaType: 'photo', quality: 1, selectionLimit: 1,  });
-      const inputImg = res.didCancel ? null : res?.assets && res.assets.length > 0 ? res.assets[0] : null;
-      if (!inputImg) {
-        Alert.alert('Image picker canceled', 'Please pick an image.');
-        setLogs('Image picker canceled');
-        setStatus('Failed');
-
-        return;
-      }
-      const out = await NativeMedia3Module.imageToVideo(inputImg.uri, 5000); // 5 seconds default
-      setLogs(`Conversion complete\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
-  };
-
-  const runTranscode = async () => {
-    if (!singleVideo) {
-      Alert.alert('Missing video', 'Please pick a video first.');
-      return;
-    }
-    setLogs('Transcoding/Compressing...');
-    setStatus('Processing');
-    setBusy(true);
-    try {
-      // Example: 720p, default bitrate
-      const out = await NativeMedia3Module.transcode(singleVideo, 1280, 720, 0); 
-      setLogs(`Transcode complete\nOutput: ${out}`);
-      setStatus('Completed');
-      setOutputUri(out);
-      setBusy(false);
-    } catch (e: any) {
-      console.error(e);
-      setLogs(`Error: ${e.message}`);
-      setStatus('Failed');
-      setBusy(false);
-    }
-  };
-
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        <Text style={styles.header}>Media3 Editor</Text>
-        <Text style={styles.subHeader}>Trim · Speed · Merge — native Android Media3 powered</Text>
+        <Text style={styles.header}>Universal Media Engine</Text>
+        <Text style={styles.subHeader}>Powered by MediaEngine.ts & Media3</Text>
 
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Source</Text>
           <View style={styles.rowCentered}>
             <TouchableOpacity
               style={[styles.primaryButton, { flex: 1, marginRight: 8 }]}
-              onPress={pickVideoSingle}
+              onPress={() => pickVideo(setSingleVideo)}
               disabled={busy}
             >
               <Text style={styles.primaryButtonText}>{singleVideo ? 'Change Source' : 'Pick Source'}</Text>
@@ -410,7 +223,7 @@ export default function Media3DemoScreen() {
               <Text style={styles.secondaryButtonText}>Clear</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.smallText}>Selected: {singleVideo || 'None'}</Text>
+          <Text style={styles.smallText} numberOfLines={1}>Selected: {singleVideo || 'None'}</Text>
           {singleVideo ? (
             <View style={styles.previewRow}>
               <View style={styles.previewBox}>
@@ -421,45 +234,26 @@ export default function Media3DemoScreen() {
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Trim</Text>
+          <Text style={styles.cardTitle}>Trim & Speed</Text>
           <View style={styles.row}>
             <TextInput style={[styles.input, { marginRight: 8 }]} value={trimStart} onChangeText={setTrimStart} placeholder="Start ms" keyboardType="numeric" editable={!busy} />
             <TextInput style={styles.input} value={trimEnd} onChangeText={setTrimEnd} placeholder="End ms" keyboardType="numeric" editable={!busy} />
           </View>
           <TouchableOpacity style={styles.primaryButton} onPress={runTrim} disabled={busy || !singleVideo}>
-            <Text style={styles.primaryButtonText}>{busy ? 'Processing…' : 'Trim Video'}</Text>
+            <Text style={styles.primaryButtonText}>Trim Video</Text>
           </TouchableOpacity>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Speed</Text>
-          <View style={styles.row}>
-            <TextInput style={styles.input} value={speed} onChangeText={setSpeed} placeholder="Speed (e.g., 0.5 or 1.5)" keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'decimal-pad'} editable={!busy} />
-          </View>
-          <View style={[styles.row, { alignItems: 'center', marginTop: 8 }]}> 
-            <Text style={{ marginRight: 8 }}>Preserve Pitch</Text>
-            <Switch value={preservePitch} onValueChange={setPreservePitch} disabled={busy} />
-          </View>
-          <TouchableOpacity style={styles.primaryButton} onPress={runSpeed} disabled={busy || !singleVideo}>
-            <Text style={styles.primaryButtonText}>{busy ? 'Processing…' : 'Apply Speed'}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Advanced Edits</Text>
           
-          {/* Text Overlay */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Text Overlay (Time: Start-End above)</Text>
-            <View style={styles.row}>
-              <TextInput style={[styles.input, { flex: 2 }]} value={overlayText} onChangeText={setOverlayText} placeholder="Text" />
-              <TouchableOpacity style={styles.secondaryButton} onPress={runTextOverlay} disabled={busy || !singleVideo}>
-                <Text style={styles.buttonText}>Add Text</Text>
-              </TouchableOpacity>
-            </View>
+          <View style={[styles.row, { marginTop: 12 }]}>
+            <TextInput style={styles.input} value={speed} onChangeText={setSpeed} placeholder="Speed" keyboardType="numeric" editable={!busy} />
+             <TouchableOpacity style={[styles.primaryButton, { marginLeft: 8, flex: 1 }]} onPress={runSpeed} disabled={busy || !singleVideo}>
+              <Text style={styles.primaryButtonText}>Apply Speed</Text>
+            </TouchableOpacity>
           </View>
+        </View>
 
-          {/* Rotate */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Transformations</Text>
+          
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Rotate / Flip</Text>
             <View style={styles.row}>
@@ -476,7 +270,6 @@ export default function Media3DemoScreen() {
             </View>
           </View>
 
-          {/* Crop */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Crop (x,y,w,h)</Text>
             <View style={styles.row}>
@@ -486,30 +279,35 @@ export default function Media3DemoScreen() {
               </TouchableOpacity>
             </View>
           </View>
-
-          {/* Extract Frame */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Extract Frame (ms)</Text>
+          
+           <View style={styles.inputGroup}>
+            <Text style={styles.label}>Text Overlay</Text>
             <View style={styles.row}>
-              <TextInput style={[styles.input, { flex: 1 }]} value={extractTime} onChangeText={setExtractTime} keyboardType="numeric" />
-              <TouchableOpacity style={styles.secondaryButton} onPress={runExtractFrame} disabled={busy || !singleVideo}>
-                <Text style={styles.buttonText}>Extract</Text>
+              <TextInput style={[styles.input, { flex: 2 }]} value={overlayText} onChangeText={setOverlayText} placeholder="Text" />
+              <TouchableOpacity style={styles.secondaryButton} onPress={runTextOverlay} disabled={busy || !singleVideo}>
+                <Text style={styles.buttonText}>Add Text</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>New Features</Text>
+          <Text style={styles.cardTitle}>Tools</Text>
           <View style={styles.rowCentered}>
             <TouchableOpacity style={[styles.secondaryButton, { flex: 1, marginRight: 8 }]} onPress={runCut} disabled={busy || !singleVideo}>
-              <Text style={styles.secondaryButtonText}>Cut (Remove Middle)</Text>
+              <Text style={styles.secondaryButtonText}>Cut Middle</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.secondaryButton, { flex: 1 }]} onPress={runTranscode} disabled={busy || !singleVideo}>
-              <Text style={styles.secondaryButtonText}>Compress (720p)</Text>
+              <Text style={styles.secondaryButtonText}>Compress 720p</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.rowCentered}>
+           <View style={[styles.rowCentered, { marginTop: 8 }]}>
+             <TextInput style={[styles.input, { flex: 1, marginRight: 8 }]} value={extractTime} onChangeText={setExtractTime} keyboardType="numeric" placeholder="Time ms" />
+            <TouchableOpacity style={[styles.secondaryButton, { flex: 1 }]} onPress={runExtractFrame} disabled={busy || !singleVideo}>
+               <Text style={styles.secondaryButtonText}>Extract Frame</Text>
+            </TouchableOpacity>
+          </View>
+           <View style={[styles.rowCentered, { marginTop: 8 }]}>
             <TouchableOpacity style={[styles.secondaryButton, { flex: 1 }]} onPress={runImageToVideo} disabled={busy || !singleVideo}>
                <Text style={styles.secondaryButtonText}>Img -&gt; Vid (5s)</Text>
             </TouchableOpacity>
@@ -519,10 +317,10 @@ export default function Media3DemoScreen() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Merge Videos</Text>
           <View style={styles.rowCentered}>
-            <TouchableOpacity style={[styles.primaryButton, { flex: 1, marginRight: 8 }]} onPress={() => pickVideo('A')} disabled={busy}>
+            <TouchableOpacity style={[styles.primaryButton, { flex: 1, marginRight: 8 }]} onPress={() => pickVideo(setVideoA)} disabled={busy}>
               <Text style={styles.primaryButtonText}>{videoA ? 'Change A' : 'Pick A'}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.primaryButton, { flex: 1 }]} onPress={() => pickVideo('B')} disabled={busy}>
+            <TouchableOpacity style={[styles.primaryButton, { flex: 1 }]} onPress={() => pickVideo(setVideoB)} disabled={busy}>
               <Text style={styles.primaryButtonText}>{videoB ? 'Change B' : 'Pick B'}</Text>
             </TouchableOpacity>
           </View>
@@ -540,62 +338,99 @@ export default function Media3DemoScreen() {
           </View>
         </View>
 
-        <View style={styles.card}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.cardTitle}>Output</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              {busy ? <ActivityIndicator color="#1976D2" /> : null}
-              <Text style={[styles.smallText, { marginLeft: 8 }]}>Status: {status}</Text>
-            </View>
-          </View>
-
-          <Text style={[styles.label, { marginTop: 12 }]}>Logs</Text>
-          <View style={styles.logBox}>
-            <Text style={styles.logText}>{logs || 'No logs yet.'}</Text>
-          </View>
-
-          {outputUri ? (
-            <>
-              <Text style={[styles.label, { marginTop: 12 }]}>Preview</Text>
-              <View style={styles.videoContainer}>
-                {outputUri.endsWith('.jpg') || outputUri.endsWith('.png') ? (
-                  <Image source={{ uri: outputUri }} style={styles.video} resizeMode="contain" />
+        {outputUri ? (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Output Preview</Text>
+            <View style={styles.previewRow}>
+              <View style={styles.previewBox}>
+                {outputUri.toLowerCase().endsWith('.mp4') ? (
+                  <Video
+                    source={{ uri: outputUri }}
+                    style={styles.previewVideo}
+                    resizeMode="contain"
+                    paused={false}
+                    controls
+                  />
                 ) : (
-                  <Video source={{ uri: outputUri }} style={styles.video} controls resizeMode="contain" />
+                  <Image
+                    source={{ uri: outputUri }}
+                    style={styles.previewVideo}
+                    resizeMode="contain"
+                  />
                 )}
               </View>
-              <Text style={styles.smallText}>{outputUri}</Text>
-            </>
-          ) : null}
+            </View>
+            <Text style={styles.smallText}>Path: {outputUri}</Text>
+          </View>
+        ) : null}
+
+        <View style={[styles.card, { backgroundColor: '#f0f0f0' }]}>
+          <Text style={styles.cardTitle}>Logs</Text>
+          <Text style={styles.logText}>{logs}</Text>
+          <Text style={{ fontWeight: 'bold', marginTop: 8 }}>Status: {status}</Text>
+          {outputUri ? <Text style={styles.smallText}>Output: {outputUri}</Text> : null}
         </View>
+        
+        <View style={{ height: 40 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F3F6F9' },
-  scroll: { padding: 16, paddingBottom: 24 },
-  header: { fontSize: 26, fontWeight: '800', marginBottom: 6, color: '#0D1B2A' },
-  subHeader: { fontSize: 14, color: '#4E5D6C', marginBottom: 16 },
-  label: { fontSize: 14, fontWeight: '600', marginBottom: 6, color: '#0D1B2A' },
-  input: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E0E6ED', borderRadius: 10, padding: 12, fontSize: 16, color: '#0D1B2A', flex: 1 },
-  row: { flexDirection: 'row', alignItems: 'center' },
-  rowCentered: { flexDirection: 'row', alignItems: 'center' },
-  card: { backgroundColor: '#FFFFFF', borderRadius: 14, padding: 14, marginBottom: 14, borderWidth: 1, borderColor: '#E6ECF2', shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 8, shadowOffset: { width: 0, height: 2 }, elevation: 1 },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#0D1B2A', marginBottom: 8 },
-  primaryButton: { backgroundColor: '#1976D2', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, alignItems: 'center', marginVertical: 12 },
-  primaryButtonText: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  secondaryButton: { backgroundColor: '#EEF5FF', paddingVertical: 12, paddingHorizontal: 12, borderRadius: 10, alignItems: 'center', borderWidth: 1, marginVertical: 12, borderColor: '#D0E4FF' },
-  secondaryButtonText: { color: '#1976D2', fontSize: 13, fontWeight: '700' },
-  smallText: { fontSize: 12, color: '#4E5D6C' },
-  logBox: { backgroundColor: '#0B1020', padding: 12, borderRadius: 10, marginTop: 6, minHeight: 140 },
-  logText: { color: '#7CFC8A', fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace' }) as string, fontSize: 12 },
-  videoContainer: { width: '100%', aspectRatio: 1, backgroundColor: '#000', borderRadius: 12, overflow: 'hidden', marginTop: 8 },
-  video: { width: '100%', height: '100%' },
-  previewRow: { flexDirection: 'row', marginTop: 8 },
-  previewBox: { aspectRatio: 1, width: '100%', borderRadius: 10, overflow: 'hidden', backgroundColor: '#000' },
+  container: { flex: 1, backgroundColor: '#fff' },
+  scroll: { padding: 16 },
+  header: { fontSize: 24, fontWeight: 'bold', marginBottom: 4 },
+  subHeader: { fontSize: 14, color: '#666', marginBottom: 16 },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    borderWidth: 1,
+    borderColor: '#eee'
+  },
+  cardTitle: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  rowCentered: { flexDirection: 'row', alignItems: 'center', marginTop: 8 },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    padding: 8,
+    height: 40,
+  },
+  primaryButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  primaryButtonText: { color: '#fff', fontWeight: '600' },
+  secondaryButton: {
+    backgroundColor: '#eee',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  secondaryButtonText: { color: '#333' },
+  buttonText: { color: '#333' },
+  previewRow: { marginTop: 12, height: 200 },
+  previewBox: { flex: 1, backgroundColor: '#000', borderRadius: 8, overflow: 'hidden' },
   previewVideo: { width: '100%', height: '100%' },
-  inputGroup: { marginBottom: 16 },
-  buttonText: { color: '#1976D2', fontSize: 13, fontWeight: '700' },
+  smallText: { fontSize: 12, color: '#666', marginTop: 4 },
+  inputGroup: { marginBottom: 12 },
+  label: { fontSize: 14, marginBottom: 4, color: '#333' },
+  logText: { fontSize: 12, fontFamily: 'monospace', color: '#333' },
 });

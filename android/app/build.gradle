@@ -105,6 +105,13 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    
+    // JSI module setup (optional - for future enhancements)
+    // externalNativeBuild {
+    //     cmake {
+    //         path "src/main/cpp/CMakeLists.txt"
+    //     }
+    // }
 }
 
 configurations {
@@ -127,6 +134,7 @@ dependencies {
     implementation "androidx.media3:media3-transformer:${media3_version}"
     implementation "androidx.media3:media3-effect:${media3_version}"
     implementation "androidx.media3:media3-common:${media3_version}"
+    implementation "androidx.media:media:1.7.0"
 }
 
 project.ext.vectoricons = [

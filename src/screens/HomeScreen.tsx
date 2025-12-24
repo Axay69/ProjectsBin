@@ -38,6 +38,10 @@ type RootStackParamList = {
   SystemNavigationBarDemo: undefined;
   NativeFFmpegDemo: undefined;
   NativeMedia3Demo: undefined;
+  PipDemo: undefined;
+  VideoEditor: { videoUri?: string } | undefined;
+  XTunes: undefined;
+  CustomSliderDemo: undefined;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -183,9 +187,29 @@ export default function HomeScreen({ navigation }: Props) {
           onPress={() => navigation.navigate('MotionX')}
         />
         <TaskItem
+          title="xTunes"
+          subtitle="Tony Stark's Music Interface"
+          onPress={() => navigation.navigate('XTunes')}
+        />
+        <TaskItem
           title="Native Media3 Demo"
           subtitle="Android Media3 editing (no FFmpeg)"
           onPress={() => navigation.navigate('NativeMedia3Demo')}
+        />
+        <TaskItem
+          title="Pip Demo"
+          subtitle="Android pip demo with custom contols"
+          onPress={() => navigation.navigate('PipDemo')}
+        />
+        <TaskItem
+          title="Video Editor"
+          subtitle="Timeline-based video editing UI"
+          onPress={() => navigation.navigate('VideoEditor')}
+        />
+        <TaskItem
+          title="Custom Slider Demo"
+          subtitle="Native Android slider with JSI"
+          onPress={() => navigation.navigate('CustomSliderDemo')}
         />
       </ScrollView>
     </View>

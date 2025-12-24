@@ -6,6 +6,7 @@ import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableMap
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.common.util.UnstableApi
@@ -35,6 +36,165 @@ import com.google.common.collect.ImmutableList
 class NativeMedia3Module(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
   override fun getName(): String = "NativeMedia3Module"
+
+  @OptIn(UnstableApi::class)
+  @ReactMethod
+  fun processVideo(inputUri: String, config: ReadableMap, promise: Promise) {
+    try {
+      val uri = toFileUri(inputUri)
+      val mediaItemBuilder = MediaItem.Builder().setUri(uri)
+      
+      // 1. Trim
+      if (config.hasKey("trim")) {
+        val trim = config.getMap("trim")!!
+        val start = if (trim.hasKey("start")) trim.getDouble("start").toLong() else 0L
+        val end = if (trim.hasKey("end")) trim.getDouble("end").toLong() else Long.MAX_VALUE
+        
+        mediaItemBuilder.setClippingConfiguration(
+          MediaItem.ClippingConfiguration.Builder()
+            .setStartPositionMs(start)
+            .setEndPositionMs(end)
+            .build()
+        )
+      }
+
+      val videoEffects = mutableListOf<androidx.media3.common.Effect>()
+      val audioProcessors = mutableListOf<androidx.media3.common.audio.AudioProcessor>()
+
+      // 2. Speed
+      if (config.hasKey("speed")) {
+        val speedVal = config.getDouble("speed").toFloat()
+        videoEffects.add(SpeedChangeEffect(speedVal))
+        val sonic = SonicAudioProcessor()
+        sonic.setSpeed(speedVal)
+        sonic.setPitch(1f)
+        audioProcessors.add(sonic)
+      }
+
+      // 3. Rotate
+      if (config.hasKey("rotation")) {
+        val rotationDegrees = config.getDouble("rotation").toFloat()
+        val rotation = MatrixTransformation { _ ->
+          val m = android.graphics.Matrix()
+          m.postRotate(rotationDegrees)
+          m
+        }
+        videoEffects.add(rotation)
+      }
+
+      // 4. Crop
+      if (config.hasKey("crop")) {
+        val cropMap = config.getMap("crop")!!
+        val left = cropMap.getDouble("left").toFloat()
+        val top = cropMap.getDouble("top").toFloat()
+        val right = cropMap.getDouble("right").toFloat()
+        val bottom = cropMap.getDouble("bottom").toFloat()
+
+        val retriever = MediaMetadataRetriever()
+        retriever.setDataSource(reactApplicationContext, uri)
+        val width = (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH) ?: "0").toInt()
+        val height = (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT) ?: "0").toInt()
+        retriever.release()
+
+        if (width > 0 && height > 0) {
+           val nLeft = (left / width) * 2 - 1
+           val nRight = (right / width) * 2 - 1
+           val nTop = 1 - (top / height) * 2
+           val nBottom = 1 - (bottom / height) * 2
+           videoEffects.add(Crop(nLeft, nRight, nBottom, nTop))
+        }
+      }
+
+      // 5. Overlay
+      if (config.hasKey("overlay")) {
+        val overlayMap = config.getMap("overlay")!!
+        val text = overlayMap.getString("text") ?: ""
+        val x = overlayMap.getDouble("x").toFloat()
+        val y = overlayMap.getDouble("y").toFloat()
+        
+        // Get dimensions if not already
+        val retriever = MediaMetadataRetriever()
+        retriever.setDataSource(reactApplicationContext, uri)
+        val width = (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH) ?: "0").toInt()
+        val height = (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT) ?: "0").toInt()
+        retriever.release()
+
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint().apply {
+          color = Color.WHITE
+          textSize = 100f
+          isAntiAlias = true
+          style = Paint.Style.FILL
+          setShadowLayer(10f, 0f, 0f, Color.BLACK)
+        }
+        canvas.drawText(text, x, y, paint)
+        val overlay = BitmapOverlay.createStaticBitmapOverlay(bitmap)
+        videoEffects.add(OverlayEffect(ImmutableList.of<TextureOverlay>(overlay)))
+      }
+
+      // 6. Flip
+      if (config.hasKey("flip")) {
+         val flipMap = config.getMap("flip")!!
+         val h = if (flipMap.hasKey("horizontal")) flipMap.getBoolean("horizontal") else false
+         val v = if (flipMap.hasKey("vertical")) flipMap.getBoolean("vertical") else false
+         if (h || v) {
+             val flipEffect = MatrixTransformation { _ ->
+                val m = android.graphics.Matrix()
+                m.postScale(if (h) -1f else 1f, if (v) -1f else 1f)
+                m
+             }
+             videoEffects.add(flipEffect)
+         }
+      }
+      
+      // 7. Compression / Resolution (Presentation)
+      var mimeType = MimeTypes.VIDEO_H264
+      if (config.hasKey("compression")) {
+          val comp = config.getString("compression")
+          if (comp == "HEVC_720P") {
+              mimeType = MimeTypes.VIDEO_H265
+              // Resize to 720p height?
+              // Calculate width preserving aspect ratio
+               val retriever = MediaMetadataRetriever()
+               retriever.setDataSource(reactApplicationContext, uri)
+               val width = (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH) ?: "0").toInt()
+               val height = (retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT) ?: "0").toInt()
+               retriever.release()
+               
+               if (height > 720) {
+                   val scale = 720f / height
+                   val newW = (width * scale).toInt()
+                   val alignedW = alignTo16(newW)
+                   val alignedH = alignTo16(720)
+                   videoEffects.add(Presentation.createForWidthAndHeight(alignedW, alignedH, Presentation.LAYOUT_SCALE_TO_FIT))
+               }
+          }
+      }
+
+      val editedMediaItem = EditedMediaItem.Builder(mediaItemBuilder.build())
+        .setEffects(Effects(audioProcessors, videoEffects))
+        .build()
+
+      val outPath = outputFile("processed")
+      val transformer = Transformer.Builder(reactApplicationContext)
+        .setVideoMimeType(mimeType)
+        .setAudioMimeType(MimeTypes.AUDIO_AAC)
+        .addListener(object : Transformer.Listener {
+          override fun onCompleted(composition: Composition, result: androidx.media3.transformer.ExportResult) {
+            promise.resolve("file://$outPath")
+          }
+          override fun onError(composition: Composition, result: androidx.media3.transformer.ExportResult, exception: androidx.media3.transformer.ExportException) {
+            promise.reject("ERROR", exception.message)
+          }
+        })
+        .build()
+
+      transformer.start(editedMediaItem, outPath)
+    } catch (e: Exception) {
+      promise.reject("ERROR", e.message)
+    }
+  }
 
   private fun toFileUri(input: String): Uri {
     return if (input.startsWith("file://")) {

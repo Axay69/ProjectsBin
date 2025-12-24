@@ -31,18 +31,23 @@ import MotiToastStackScreen from '../screens/MotiToastStackScreen';
 import MotiAnimatedTabBarScreen from '../screens/MotiAnimatedTabBarScreen';
 import SystemNavigationBarDemoScreen from '../screens/SystemNavigationBarDemoScreen';
 import Media3DemoScreen from '../screens/Media3DemoScreen';
+import PipDemoScreen from '../screens/PipDemoScreen';
+import VideoEditorScreen from '../videoeditor/screens/VideoEditorScreen';
 import XTHome from '../xtracker/screens/HomeScreen';
 import XTFriends from '../xtracker/screens/FriendsScreen';
 import XTProfile from '../xtracker/screens/ProfileScreen';
 import XTChallengeDetail from '../xtracker/screens/ChallengeDetailScreen';
 import XTFriendProgress from '../xtracker/screens/FriendProgressScreen';
 import MotionXFlow from '../motionx/MotionXFlow';
+import XTunesNavigator from '../xTunes/navigation/XTunesNavigator';
+import CustomSliderDemoScreen from '../screens/CustomSliderDemoScreen';
 
 type RootStackParamList = {
   Home: undefined;
   Counter: undefined;
   Todos: undefined;
   XTracker: undefined;
+  XTunes: undefined;
   MotionX: undefined;
   SystemNavigationBarDemo: undefined;
   Notes: undefined;
@@ -69,6 +74,9 @@ type RootStackParamList = {
   MotiAnimatedTabBar: undefined;
   NativeFFmpegDemo: undefined;
   NativeMedia3Demo: undefined;
+  PipDemo: undefined;
+  VideoEditor: { videoUri?: string } | undefined;
+  CustomSliderDemo: undefined;
 };
 
 type XTHomeStackParamList = {
@@ -201,6 +209,7 @@ export default function AppNavigator() {
         <RootStack.Screen name="Counter" component={CounterScreen} />
         <RootStack.Screen name="Todos" component={TodoScreen} />
         <RootStack.Screen name="MotionX" children={() => <MotionXFlow />} />
+        <RootStack.Screen name="XTunes" component={XTunesNavigator} />
         <RootStack.Screen
           name="SystemNavigationBarDemo"
           component={SystemNavigationBarDemoScreen}
@@ -305,6 +314,18 @@ export default function AppNavigator() {
         <RootStack.Screen
           name="NativeMedia3Demo"
           component={Media3DemoScreen}
+        />
+        <RootStack.Screen
+          name="PipDemo"
+          component={PipDemoScreen}
+        />
+        <RootStack.Screen
+          name="VideoEditor"
+          component={VideoEditorScreen}
+        />
+        <RootStack.Screen
+          name="CustomSliderDemo"
+          component={CustomSliderDemoScreen}
         />
       </RootStack.Navigator>
     </NavigationContainer>
