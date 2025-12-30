@@ -42,6 +42,12 @@ type RootStackParamList = {
   VideoEditor: { videoUri?: string } | undefined;
   XTunes: undefined;
   CustomSliderDemo: undefined;
+  StateManagementRD: undefined;
+  ContextDemo: undefined;
+  ZustandDemo: undefined;
+  ZegoCloudDemo: undefined;
+  ZegoCloudProDemo: undefined;
+  ZegoScreenCastingDemo: undefined;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -210,6 +216,26 @@ export default function HomeScreen({ navigation }: Props) {
           title="Custom Slider Demo"
           subtitle="Native Android slider with JSI"
           onPress={() => navigation.navigate('CustomSliderDemo')}
+        />
+        <TaskItem
+          title="State Management R&D"
+          subtitle="Zustand vs Context - Measure re-render counts"
+          onPress={() => navigation.navigate('StateManagementRD')}
+        />
+        <TaskItem
+          title="ZegoCloud Demo"
+          subtitle="1-on-1 Voice & Video Calls"
+          onPress={() => navigation.navigate('ZegoCloudDemo')}
+        />
+        <TaskItem
+          title="ZegoCloud Pro Demo"
+          subtitle="1-on-1/Group with pre-join options"
+          onPress={() => navigation.navigate('ZegoCloudProDemo')}
+        />
+        <TaskItem
+          title="ZegoCloud Screen Casting Demo"
+          subtitle="Android screen sharing in gallery layout"
+          onPress={() => navigation.navigate('ZegoScreenCastingDemo')}
         />
       </ScrollView>
     </View>

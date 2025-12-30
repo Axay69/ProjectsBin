@@ -41,6 +41,12 @@ import XTFriendProgress from '../xtracker/screens/FriendProgressScreen';
 import MotionXFlow from '../motionx/MotionXFlow';
 import XTunesNavigator from '../xTunes/navigation/XTunesNavigator';
 import CustomSliderDemoScreen from '../screens/CustomSliderDemoScreen';
+import StateManagementRDScreen from '../screens/StateManagementRDScreen';
+import ContextDemoScreen from '../screens/ContextDemoScreen';
+import ZustandDemoScreen from '../screens/ZustandDemoScreen';
+import ZegoCloudDemoScreen from '../screens/ZegoCloudDemoScreen';
+import ZegoCloudProDemoScreen from '../screens/ZegoCloudProDemoScreen';
+import ZegoScreenCastingDemoScreen from '../screens/ZegoScreenCastingDemoScreen';
 
 type RootStackParamList = {
   Home: undefined;
@@ -77,6 +83,12 @@ type RootStackParamList = {
   PipDemo: undefined;
   VideoEditor: { videoUri?: string } | undefined;
   CustomSliderDemo: undefined;
+  StateManagementRD: undefined;
+  ContextDemo: undefined;
+  ZustandDemo: undefined;
+  ZegoCloudDemo: undefined;
+  ZegoCloudProDemo: undefined;
+  ZegoScreenCastingDemo: undefined;
 };
 
 type XTHomeStackParamList = {
@@ -326,6 +338,30 @@ export default function AppNavigator() {
         <RootStack.Screen
           name="CustomSliderDemo"
           component={CustomSliderDemoScreen}
+        />
+        <RootStack.Screen
+          name="StateManagementRD"
+          component={StateManagementRDScreen}
+        />
+        <RootStack.Screen
+          name="ContextDemo"
+          component={ContextDemoScreen}
+        />
+        <RootStack.Screen
+          name="ZustandDemo"
+          component={ZustandDemoScreen}
+        />
+        <RootStack.Screen
+          name="ZegoCloudDemo"
+          component={ZegoCloudDemoScreen}
+        />
+        <RootStack.Screen
+          name="ZegoCloudProDemo"
+          component={ZegoCloudProDemoScreen}
+        />
+        <RootStack.Screen
+          name="ZegoScreenCastingDemo"
+          component={ZegoScreenCastingDemoScreen}
         />
       </RootStack.Navigator>
     </NavigationContainer>
