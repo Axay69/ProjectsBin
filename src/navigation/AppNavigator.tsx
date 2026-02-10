@@ -47,6 +47,15 @@ import ZustandDemoScreen from '../screens/ZustandDemoScreen';
 import ZegoCloudDemoScreen from '../screens/ZegoCloudDemoScreen';
 import ZegoCloudProDemoScreen from '../screens/ZegoCloudProDemoScreen';
 import ZegoScreenCastingDemoScreen from '../screens/ZegoScreenCastingDemoScreen';
+import RiveAnimationDemoScreen from '../screens/RiveAnimationDemoScreen';
+import StickyHeaderDemoScreen from '../screens/StickyHeaderDemoScreen';
+import MeshGradientDemoScreen from '../screens/MeshGradientDemoScreen';
+import JotaiScreen1 from '../jotai/JotaiScreen1';
+import JotaiScreen2 from '../jotai/JotaiScreen2';
+import HookFormDemoScreen from '../screens/HookFormDemoScreen';
+import UnistylesDemoScreen from '../screens/UnistylesDemoScreen';
+import ContextMenuDemoScreen from '../screens/ContextMenuDemoScreen';
+
 
 type RootStackParamList = {
   Home: undefined;
@@ -89,7 +98,16 @@ type RootStackParamList = {
   ZegoCloudDemo: undefined;
   ZegoCloudProDemo: undefined;
   ZegoScreenCastingDemo: undefined;
+  RiveAnimationDemo: undefined;
+  StickyHeaderDemo: undefined;
+  MeshGradientDemo: undefined;
+  JotaiScreen1: undefined;
+  JotaiScreen2: undefined;
+  HookFormDemo: undefined;
+  UnistylesDemo: undefined;
+  ContextMenuDemo: undefined;
 };
+
 
 type XTHomeStackParamList = {
   XTHomeTab: undefined;
@@ -363,7 +381,40 @@ export default function AppNavigator() {
           name="ZegoScreenCastingDemo"
           component={ZegoScreenCastingDemoScreen}
         />
+        <RootStack.Screen
+          name="RiveAnimationDemo"
+          component={RiveAnimationDemoScreen}
+        />
+        <RootStack.Screen
+          name="StickyHeaderDemo"
+          component={StickyHeaderDemoScreen}
+        />
+        <RootStack.Screen
+          name="MeshGradientDemo"
+          component={MeshGradientDemoScreen}
+        />
+        <RootStack.Screen
+          name="JotaiScreen1"
+          component={JotaiScreen1}
+        />
+        <RootStack.Screen
+          name="JotaiScreen2"
+          component={JotaiScreen2}
+        />
+        <RootStack.Screen
+          name="HookFormDemo"
+          component={HookFormDemoScreen}
+        />
+        <RootStack.Screen
+          name="UnistylesDemo"
+          component={UnistylesDemoScreen}
+        />
+        <RootStack.Screen
+          name="ContextMenuDemo"
+          component={ContextMenuDemoScreen}
+        />
       </RootStack.Navigator>
+
     </NavigationContainer>
   );
 }

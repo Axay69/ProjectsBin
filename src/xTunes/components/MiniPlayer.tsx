@@ -6,10 +6,12 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FastImage from 'react-native-fast-image';
 import { XTunesStackParamList } from '../navigation/XTunesNavigator';
 import { useMusicStore } from '../store/musicStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function MiniPlayer() {
   const navigation = useNavigation<NativeStackNavigationProp<XTunesStackParamList>>();
   const { currentSong, isPlaying, togglePlay, progress, duration } = useMusicStore();
+  const insets = useSafeAreaInsets();
 
   if (!currentSong) return null;
 
@@ -23,26 +25,26 @@ export default function MiniPlayer() {
   };
 
   return (
-    <View style={styles.miniPlayer}>
-     
-      <TouchableOpacity 
+    <View style={[styles.miniPlayer, { bottom: insets.bottom + 12 }]}>
+
+      <TouchableOpacity
         style={styles.miniPlayerContent}
         onPress={handleNavigateToSong}
         activeOpacity={0.9}
       >
-        <FastImage 
+        <FastImage
           source={{ uri: currentSong.image }}
           style={styles.miniPlayerImage}
         />
-         {/* Top progress indicator */}
-         <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${progressPercent}%`, borderRadius: 6 }]} />
-      </View>
+        {/* Top progress indicator */}
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, { width: `${progressPercent}%`, borderRadius: 6 }]} />
+        </View>
         <View style={styles.miniPlayerInfo}>
           <Text style={styles.miniPlayerTitle} numberOfLines={1}>{currentSong.song}</Text>
           <Text style={styles.miniPlayerArtist} numberOfLines={1}>{currentSong.primary_artists}</Text>
         </View>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.miniPlayerAction}
           onPress={() => togglePlay()}
           activeOpacity={0.8}

@@ -8,7 +8,7 @@ import { getExercises, getFilters, MuscleWikiExerciseSummary, getStoredMuscleWik
 
 export default function MuscleWikiScreen({ route }: any) {
     const navigation = useNavigation<any>();
-    
+
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [results, setResults] = useState<MuscleWikiExerciseSummary[]>([]);
@@ -26,7 +26,7 @@ export default function MuscleWikiScreen({ route }: any) {
     const [hasMore, setHasMore] = useState(true);
 
     const [showKeyModal, setShowKeyModal] = useState(false);
-    const [apiKeyInput, setApiKeyInput] = useState('');
+    const [apiKeyInput, setApiKeyInput] = useState('b65e121ebfmsh20c0fac4910f5dcp1d1de7jsn524616479caa');
 
     // Effect to handle navigation parameters from BodyMap
     useEffect(() => {
@@ -38,20 +38,20 @@ export default function MuscleWikiScreen({ route }: any) {
         if (route?.params?.filterMuscle) {
             const m = route.params.filterMuscle;
             console.log('Received filterMuscle:', m);
-            
+
             // Set selections
             setSelectedMuscles([m]);
             setSelectedCategory(null);
             setSelectedDifficulty(null);
-            
+
             // Set active filters immediately for the fetch
             setActiveMuscles([m]);
             setActiveCategory(null);
             setActiveDifficulty(null);
-            
+
             // Trigger fetch
             fetchWithMuscle(m);
-            
+
             // Clear params to prevent re-triggering
             navigation.setParams({ filterMuscle: undefined });
         } else {
@@ -111,7 +111,7 @@ export default function MuscleWikiScreen({ route }: any) {
         } catch (e) {
             showToast.error('Error', 'Failed to load exercises');
             console.error(e);
-            
+
         } finally {
             setLoading(false);
         }
@@ -206,7 +206,7 @@ export default function MuscleWikiScreen({ route }: any) {
             }}
         >
             <MaterialCommunityIcons name="book-open-page-variant" size={26} color="#9CA3AF" />
-            <View style={{ marginLeft: 12}}>
+            <View style={{ marginLeft: 12 }}>
                 <Text style={{ color: '#F9FAFB', fontWeight: '600' }}>{item.id}</Text>
             </View>
             <View style={{ marginLeft: 12, flex: 1 }}>
@@ -218,7 +218,7 @@ export default function MuscleWikiScreen({ route }: any) {
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#0B0F14' }}>
-            <View style={{flex: 1, paddingHorizontal: 16, paddingTop: 8 , }}>
+            <View style={{ flex: 1, paddingHorizontal: 16, paddingTop: 8, }}>
                 <View>
                     <Text style={{ color: '#F9FAFB', fontWeight: '700', marginTop: 8 }}>Categories</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 12 }}>
@@ -309,9 +309,9 @@ export default function MuscleWikiScreen({ route }: any) {
                 visible={showKeyModal}
                 transparent={true}
                 animationType="slide"
-                onRequestClose={() => {}} 
+                onRequestClose={() => { }}
             >
-                <KeyboardAvoidingView 
+                <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', padding: 20 }}
                 >
@@ -323,17 +323,17 @@ export default function MuscleWikiScreen({ route }: any) {
                         <TouchableOpacity onPress={() => Linking.openURL('https://rapidapi.com/musclewiki-sezc-musclewiki-sezc-default/api/musclewiki-api')}>
                             <Text style={{ color: '#0EA5A4', marginBottom: 16, textDecorationLine: 'underline' }}>Get a free API key here</Text>
                         </TouchableOpacity>
-                        
+
                         <Text style={{ color: '#9CA3AF', marginBottom: 8, fontSize: 12 }}>Enter API Key:</Text>
-                        <TextInput 
+                        <TextInput
                             value={apiKeyInput}
                             onChangeText={setApiKeyInput}
                             placeholder="Paste your key here..."
                             placeholderTextColor="#6B7280"
                             style={{ backgroundColor: '#111827', color: '#F9FAFB', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#374151', marginBottom: 20 }}
                         />
-                        
-                        <TouchableOpacity 
+
+                        <TouchableOpacity
                             onPress={saveKey}
                             style={{ backgroundColor: '#0EA5A4', padding: 12, borderRadius: 8, alignItems: 'center' }}
                         >

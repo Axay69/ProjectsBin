@@ -189,8 +189,8 @@ export default function KeyboardControllerDemoScreen() {
                   item.status === 'read'
                     ? 'check-all'
                     : item.status === 'delivered'
-                    ? 'check-all'
-                    : 'check'
+                      ? 'check-all'
+                      : 'check'
                 }
                 size={14}
                 color={item.status === 'read' ? '#4FC3F7' : '#9E9E9E'}
@@ -317,7 +317,12 @@ export default function KeyboardControllerDemoScreen() {
           }
         }}
       >
-        <KeyboardToolbar.Done />
+        {/* <KeyboardToolbar.Done /> */}
+        {/* <KeyboardToolbar.Content>
+          <View style={{ backgroundColor: 'red', padding: 10 }}>
+            <Text>Hello</Text>
+          </View>
+        </KeyboardToolbar.Content> */}
       </KeyboardToolbar>
     </SafeAreaView>
   );

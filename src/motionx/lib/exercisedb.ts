@@ -24,7 +24,7 @@ function getClient() {
 
 export function setExerciseDbApiKey(key: string) {
   console.log('exercisedb_api_key', key);
-  
+
   mmkv.set('exercisedb_api_key', key);
   if (client) client.defaults.headers['x-rapidapi-key'] = key;
 }

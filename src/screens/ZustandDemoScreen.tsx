@@ -1,16 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { useCounterStore } from '../stores/zustandCounterStore';
 import { Header, Counter, Footer } from '../components/CounterComponents';
 import { useReRenderCount } from '../components/ReRenderTracker';
+import { createStyleSheet, useStyles } from 'react-native-unistyles';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 function ZustandHeader() {
   return <Header title="Zustand State Management" color="#10b981" />;
 }
 
 function ZustandCounter() {
-  // Zustand only re-renders when selected state changes
-  // Functions are stable, so selecting them doesn't cause re-renders
   const count = useCounterStore((state) => state.count);
   const increment = useCounterStore((state) => state.increment);
   const decrement = useCounterStore((state) => state.decrement);
@@ -38,9 +38,10 @@ function ZustandFooter() {
 
 export default function ZustandDemoScreen() {
   const renderCount = useReRenderCount('ZustandDemoScreen');
+  const { styles } = useStyles(stylesheet);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -70,42 +71,43 @@ export default function ZustandDemoScreen() {
           </Text>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const stylesheet = createStyleSheet((theme) => ({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: theme.colors.background,
   },
   scrollContent: {
-    padding: 16,
-    gap: 16,
+    padding: theme.spacing.lg,
+    gap: theme.spacing.lg,
   },
   infoBox: {
-    backgroundColor: '#f0fdf4',
+    backgroundColor: theme.colors.surface,
     padding: 16,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#10b981',
+    borderColor: theme.colors.border,
   },
   infoTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#065f46',
+    color: theme.colors.accent,
     marginBottom: 8,
   },
   infoText: {
     fontSize: 14,
-    color: '#047857',
+    color: theme.colors.typography,
     marginBottom: 8,
     fontFamily: 'monospace',
   },
   infoDescription: {
     fontSize: 13,
-    color: '#047857',
+    color: theme.colors.typography,
     lineHeight: 20,
+    opacity: 0.8,
   },
-});
+}));
 

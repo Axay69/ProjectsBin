@@ -1,5 +1,4 @@
 import {
-  StyleSheet,
   Text,
   View,
   Pressable,
@@ -7,6 +6,9 @@ import {
   ScrollView,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { createStyleSheet, useStyles } from 'react-native-unistyles';
+import '../styles/unistyles';
 
 type RootStackParamList = {
   Home: undefined;
@@ -48,17 +50,30 @@ type RootStackParamList = {
   ZegoCloudDemo: undefined;
   ZegoCloudProDemo: undefined;
   ZegoScreenCastingDemo: undefined;
+  RiveAnimationDemo: undefined;
+  StickyHeaderDemo: undefined;
+  MeshGradientDemo: undefined;
+  JotaiScreen1: undefined;
+  JotaiScreen2: undefined;
+  HookFormDemo: undefined;
+  UnistylesDemo: undefined;
+  ContextMenuDemo: undefined;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
 export default function HomeScreen({ navigation }: Props) {
+  const { styles, theme } = useStyles(stylesheet);
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar
+        backgroundColor={theme.colors.background}
+        barStyle={theme.colors.background === '#ffffff' ? 'dark-content' : 'light-content'}
+      />
       <Text style={styles.header}>Projects Bin</Text>
-      {/* <StatusBar backgroundColor={'red'} /> */}
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, gap: 10, paddingBottom: 20 }}
+        contentContainerStyle={styles.scrollContent}
         style={styles.list}
         showsVerticalScrollIndicator={false}
       >
@@ -162,11 +177,11 @@ export default function HomeScreen({ navigation }: Props) {
           subtitle="Entering/Exiting, Keyframes, Layout.delay()"
           onPress={() => navigation.navigate('ReanimatedKeyframesLayout')}
         />
-          <TaskItem
-            title="System Navigation Bar Demo"
-            subtitle="Android nav bar color & immersive"
-            onPress={() => navigation.navigate('SystemNavigationBarDemo')}
-          />
+        <TaskItem
+          title="System Navigation Bar Demo"
+          subtitle="Android nav bar color & immersive"
+          onPress={() => navigation.navigate('SystemNavigationBarDemo')}
+        />
         <TaskItem
           title="Reanimated: Custom Child Wrapper"
           subtitle="Animate child layout when grid reshapes"
@@ -237,14 +252,50 @@ export default function HomeScreen({ navigation }: Props) {
           subtitle="Android screen sharing in gallery layout"
           onPress={() => navigation.navigate('ZegoScreenCastingDemo')}
         />
+        <TaskItem
+          title="Rive Animation Demo"
+          subtitle="Interactive Rive animations (Bunny, Bear)"
+          onPress={() => navigation.navigate('RiveAnimationDemo')}
+        />
+        <TaskItem
+          title="Collapsible Sticky Header"
+          subtitle="Glassmorphism & Scroll Animations"
+          onPress={() => navigation.navigate('StickyHeaderDemo')}
+        />
+        <TaskItem
+          title="Mesh Gradient Demo"
+          subtitle="Vibrant and organic color transitions"
+          onPress={() => navigation.navigate('MeshGradientDemo')}
+        />
+        <TaskItem
+          title="Jotai Demo"
+          subtitle="Atomic state management sync across screens"
+          onPress={() => navigation.navigate('JotaiScreen1')}
+        />
+        <TaskItem
+          title="React Hook Form Demo"
+          subtitle="Performant forms with easy validation"
+          onPress={() => navigation.navigate('HookFormDemo')}
+        />
+        <TaskItem
+          title="Unistyles Demo"
+          subtitle="Theming and responsive styling system"
+          onPress={() => navigation.navigate('UnistylesDemo')}
+        />
+        <TaskItem
+          title="Context Menu Demo"
+          subtitle="Native long-press context menus"
+          onPress={() => navigation.navigate('ContextMenuDemo')}
+        />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 type TaskItemProps = { title: string; subtitle: string; onPress: () => void };
 
 function TaskItem({ title, subtitle, onPress }: TaskItemProps) {
+  const { styles } = useStyles(stylesheet);
   return (
     <Pressable accessibilityRole="button" onPress={onPress} style={styles.item}>
       <View style={styles.itemTextBox}>
@@ -258,10 +309,26 @@ function TaskItem({ title, subtitle, onPress }: TaskItemProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  header: { fontSize: 24, fontWeight: '700', marginBottom: 12 },
-  list: { gap: 10 },
+const stylesheet = createStyleSheet((theme) => ({
+  container: {
+    flex: 1,
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.background,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: theme.spacing.md,
+    color: theme.colors.typography,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    gap: theme.spacing.md,
+    paddingBottom: 20
+  },
+  list: {
+    // gap: 10 
+  },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -269,16 +336,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#fff',
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 6,
     elevation: 2,
   },
   itemTextBox: { flex: 1 },
-  itemTitle: { fontSize: 16, fontWeight: '700' },
-  itemSubtitle: { fontSize: 13, color: '#666', marginTop: 2 },
+  itemTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.typography,
+  },
+  itemSubtitle: {
+    fontSize: 13,
+    color: theme.colors.typography,
+    marginTop: 2,
+    opacity: 0.7,
+  },
   chevron: { paddingLeft: 8 },
-  chevronText: { fontSize: 24, color: '#999' },
-});
+  chevronText: {
+    fontSize: 24,
+    color: theme.colors.primary,
+  },
+}));
