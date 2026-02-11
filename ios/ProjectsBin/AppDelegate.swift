@@ -3,6 +3,7 @@ import Expo
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import react_native_bootsplash
 
 @main
 class AppDelegate: ExpoAppDelegate {
@@ -30,6 +31,8 @@ class AppDelegate: ExpoAppDelegate {
       in: window,
       launchOptions: launchOptions
     )
+
+    RNBootSplash.initWithStoryboard("BootSplash", rootView: window?.rootViewController?.view)
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

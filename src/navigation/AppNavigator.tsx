@@ -55,6 +55,14 @@ import JotaiScreen2 from '../jotai/JotaiScreen2';
 import HookFormDemoScreen from '../screens/HookFormDemoScreen';
 import UnistylesDemoScreen from '../screens/UnistylesDemoScreen';
 import ContextMenuDemoScreen from '../screens/ContextMenuDemoScreen';
+import D3ShapeDemoScreen from '../screens/D3ShapeDemoScreen';
+import SkiaLiquidDemoScreen from '../screens/SkiaLiquidDemoScreen';
+import SkiaAudioVisualizerScreen from '../screens/SkiaAudioVisualizerScreen';
+import DraggableDemoScreen from '../screens/DraggableDemoScreen';
+import TrueSheetDemoScreen from '../screens/TrueSheetDemoScreen';
+import ThemeSwitchDemoScreen from '../screens/ThemeSwitchDemoScreen';
+import TypeAnimationDemoScreen from '../screens/TypeAnimationDemoScreen';
+import CalendarEventsDemoScreen from '../screens/CalendarEventsDemoScreen';
 
 
 type RootStackParamList = {
@@ -106,6 +114,14 @@ type RootStackParamList = {
   HookFormDemo: undefined;
   UnistylesDemo: undefined;
   ContextMenuDemo: undefined;
+  D3ShapeDemo: undefined;
+  SkiaLiquidDemo: undefined;
+  SkiaAudioVisualizer: undefined;
+  DraggableDemo: undefined;
+  TrueSheetDemo: undefined;
+  ThemeSwitchDemo: undefined;
+  TypeAnimationDemo: undefined;
+  CalendarEventsDemo: undefined;
 };
 
 
@@ -412,6 +428,38 @@ export default function AppNavigator() {
         <RootStack.Screen
           name="ContextMenuDemo"
           component={ContextMenuDemoScreen}
+        />
+        <RootStack.Screen
+          name="D3ShapeDemo"
+          component={D3ShapeDemoScreen}
+        />
+        <RootStack.Screen
+          name="SkiaLiquidDemo"
+          component={SkiaLiquidDemoScreen}
+        />
+        <RootStack.Screen
+          name="SkiaAudioVisualizer"
+          component={SkiaAudioVisualizerScreen}
+        />
+        <RootStack.Screen
+          name="DraggableDemo"
+          component={DraggableDemoScreen}
+        />
+        <RootStack.Screen
+          name="TrueSheetDemo"
+          component={TrueSheetDemoScreen}
+        />
+        <RootStack.Screen
+          name="ThemeSwitchDemo"
+          component={ThemeSwitchDemoScreen}
+        />
+        <RootStack.Screen
+          name="TypeAnimationDemo"
+          component={TypeAnimationDemoScreen}
+        />
+        <RootStack.Screen
+          name="CalendarEventsDemo"
+          component={CalendarEventsDemoScreen}
         />
       </RootStack.Navigator>
 

@@ -100,6 +100,9 @@ export default function SongScreen() {
     }
   }, [paramSong]);
 
+  console.log('colors', colors);
+  
+
   // Keep local progress/duration in sync with global store (when not sliding)
   // useEffect(() => {
   //   if (!isSlidingRef.current) {
@@ -154,6 +157,9 @@ export default function SongScreen() {
 
   const primaryColor = Platform.OS === 'ios' ? colors?.primary : colors?.average;
   const bgColor = primaryColor || '#121212';
+  // const validColors = Object.entries(colors)
+  // .filter(([key, value]) => typeof value === 'string' && value.startsWith('#'))
+  // .map(([_, value]) => value);
   const gradientColors = [bgColor, '#000000', '#000000'];
 
   const handleGoBack = () => {

@@ -58,6 +58,14 @@ type RootStackParamList = {
   HookFormDemo: undefined;
   UnistylesDemo: undefined;
   ContextMenuDemo: undefined;
+  D3ShapeDemo: undefined;
+  SkiaLiquidDemo: undefined;
+  SkiaAudioVisualizer: undefined;
+  DraggableDemo: undefined;
+  TrueSheetDemo: undefined;
+  ThemeSwitchDemo: undefined;
+  TypeAnimationDemo: undefined;
+  CalendarEventsDemo: undefined;
 };
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -286,6 +294,46 @@ export default function HomeScreen({ navigation }: Props) {
           title="Context Menu Demo"
           subtitle="Native long-press context menus"
           onPress={() => navigation.navigate('ContextMenuDemo')}
+        />
+        <TaskItem
+          title="D3 Shape Demo"
+          subtitle="Mathematical SVG path generation"
+          onPress={() => navigation.navigate('D3ShapeDemo')}
+        />
+        <TaskItem
+          title="Skia Liquid Fusion"
+          subtitle="Organic metaballs merging effect"
+          onPress={() => navigation.navigate('SkiaLiquidDemo')}
+        />
+        <TaskItem
+          title="Skia Audio Visualizer"
+          subtitle="Animated sine waves using paths"
+          onPress={() => navigation.navigate('SkiaAudioVisualizer')}
+        />
+        <TaskItem
+          title="Draggable View"
+          subtitle="Vertical draggable drawer experience"
+          onPress={() => navigation.navigate('DraggableDemo')}
+        />
+        <TaskItem
+          title="True Sheet Demo"
+          subtitle="Native bottom sheet with snap points"
+          onPress={() => navigation.navigate('TrueSheetDemo')}
+        />
+        <TaskItem
+          title="Theme Switch Animation"
+          subtitle="Smooth circular reveal theme switching"
+          onPress={() => navigation.navigate('ThemeSwitchDemo')}
+        />
+        <TaskItem
+          title="Type Animation"
+          subtitle="Sequential text typing animations"
+          onPress={() => navigation.navigate('TypeAnimationDemo')}
+        />
+        <TaskItem
+          title="Calendar Events"
+          subtitle="Native calendar events and dialogs"
+          onPress={() => navigation.navigate('CalendarEventsDemo')}
         />
       </ScrollView>
     </SafeAreaView>

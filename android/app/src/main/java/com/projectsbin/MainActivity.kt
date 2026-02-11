@@ -9,8 +9,14 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.ReactApplication
+import android.os.Bundle
+import com.zoontek.rnbootsplash.RNBootSplash
 
 class MainActivity : ReactActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    RNBootSplash.init(this, R.style.BootTheme) // Or use your splash theme
+    super.onCreate(null) // null to prevent crashes with Fragments/Screens
+  }
 
   override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
     super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)

@@ -335,12 +335,17 @@ export default function ZegoCloudProDemoScreen({ navigation }: Props) {
           </View>
 
           <View style={styles.infoBox}>
-            <Text style={styles.infoTitle}>Instructions</Text>
+            <Text style={styles.infoTitle}>🚀 How to Start a Video Call</Text>
             <Text style={styles.infoText}>
-              1. Pick mode and type, set join options{'\n'}
-              2. Share the Call ID with others{'\n'}
-              3. Everyone joins with the same Call ID{'\n'}
-              4. Use group mode for 3+ participants
+              <Text style={{ fontWeight: 'bold' }}>1. No Tokens Needed:</Text> This demo uses <Text style={{ fontStyle: 'italic' }}>AppSign</Text> for authentication, which is why you don't need to generate or send tokens manually.{'\n\n'}
+              <Text style={{ fontWeight: 'bold' }}>2. Process for Joining:</Text>{'\n'}
+              • <Text style={{ fontWeight: 'bold' }}>User A:</Text> Enters User ID <Text style={{ color: '#000' }}>"user_1"</Text> and Call ID <Text style={{ color: '#000' }}>"my_room"</Text>.{'\n'}
+              • <Text style={{ fontWeight: 'bold' }}>User B:</Text> Enters User ID <Text style={{ color: '#000' }}>"user_2"</Text> and the SAME Call ID <Text style={{ color: '#000' }}>"my_room"</Text>.{'\n'}
+              • Both users press <Text style={{ fontWeight: 'bold' }}>Start Video Call</Text> to connect.{'\n\n'}
+              <Text style={{ fontWeight: 'bold' }}>3. Important Notes:</Text>{'\n'}
+              • Ensure both devices have an active internet connection.{'\n'}
+              • If you are testing on a simulator, the camera might not work, so use a real device if possible.{'\n'}
+              • Each participant MUST have a unique <Text style={{ fontWeight: 'bold' }}>User ID</Text>.
             </Text>
           </View>
         </ScrollView>
