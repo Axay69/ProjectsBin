@@ -20,6 +20,9 @@ import { UnistylesRuntime } from 'react-native-unistyles';
 import { storage, THEME_KEY } from './src/styles/storage';
 import { Appearance } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
+import { NotifierWrapper, } from 'react-native-notifier';
+import { Provider as ReduxProvider } from 'react-redux';
+import { store } from './src/stores/redux/store';
 
 function App() {
   useEffect(() => {
@@ -53,18 +56,23 @@ function App() {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <JotaiProvider>
-        <KeyboardProvider>
-          <GestureHandlerRootView>
-            {/* Note: In a real app, you'd use Unistyles for the status bar color too, 
-                but for now we'll keep it simple or use system defaults */}
-            <AppNavigator />
-            <GlobalMusicPlayer />
-          </GestureHandlerRootView>
-        </KeyboardProvider>
-      </JotaiProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView>
+      <NotifierWrapper containerStyle={{ marginTop: -(0 || 0) }}>
+        <SafeAreaProvider>
+          <ReduxProvider store={store}>
+            <JotaiProvider>
+              <KeyboardProvider>
+
+                {/* Note: In a real app, you'd use Unistyles for the status bar color too, 
+                  but for now we'll keep it simple or use system defaults */}
+                <AppNavigator />
+                <GlobalMusicPlayer />
+              </KeyboardProvider>
+            </JotaiProvider>
+          </ReduxProvider>
+        </SafeAreaProvider>
+      </NotifierWrapper>
+    </GestureHandlerRootView>
   );
 }
 

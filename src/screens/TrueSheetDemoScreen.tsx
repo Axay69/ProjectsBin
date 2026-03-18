@@ -32,10 +32,10 @@ export default function TrueSheetDemoScreen() {
 
     return (
         <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
-            <StatusBar
+            {/* <StatusBar
                 translucent={true}
                 hidden={isSheetOpen}
-            />
+            /> */}
             <View style={styles.header}>
                 <Text style={styles.title}>Advanced True Sheet</Text>
                 <Text style={styles.subtitle}>Version 3.x Power Features</Text>

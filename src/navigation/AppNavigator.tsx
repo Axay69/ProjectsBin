@@ -26,9 +26,6 @@ import CustomChildWrapperScreen from '../screens/CustomChildWrapperScreen';
 import BottomSheetDemoScreen from '../screens/BottomSheetDemoScreen';
 import HapticFeedbackDemoScreen from '../screens/HapticFeedbackDemoScreen';
 import ReanimatedCarouselDemoScreen from '../screens/ReanimatedCarouselDemoScreen';
-import MotiStateMachineButtonScreen from '../screens/MotiStateMachineButtonScreen';
-import MotiToastStackScreen from '../screens/MotiToastStackScreen';
-import MotiAnimatedTabBarScreen from '../screens/MotiAnimatedTabBarScreen';
 import SystemNavigationBarDemoScreen from '../screens/SystemNavigationBarDemoScreen';
 import Media3DemoScreen from '../screens/Media3DemoScreen';
 import PipDemoScreen from '../screens/PipDemoScreen';
@@ -62,7 +59,18 @@ import DraggableDemoScreen from '../screens/DraggableDemoScreen';
 import TrueSheetDemoScreen from '../screens/TrueSheetDemoScreen';
 import ThemeSwitchDemoScreen from '../screens/ThemeSwitchDemoScreen';
 import TypeAnimationDemoScreen from '../screens/TypeAnimationDemoScreen';
-import CalendarEventsDemoScreen from '../screens/CalendarEventsDemoScreen';
+import InputEffectsDemoScreen from '../screens/InputEffectsDemoScreen';
+import ScreenTransitionsDemoScreen from '../screens/ScreenTransitionsDemoScreen';
+import NotifierAndConfettiDemoScreen from '../screens/NotifierAndConfettiDemoScreen';
+import TourGuideDemoScreen from '../screens/TourGuideDemoScreen';
+import TourGuideCustomDemoScreen from '../screens/TourGuideCustomDemoScreen';
+import RateAppDemoScreen from '../screens/RateAppDemoScreen';
+import ReduxDevToolsDemoScreen from '../screens/ReduxDevToolsDemoScreen';
+import SkiaImageMaskerDemoScreen from '../screens/SkiaImageMaskerDemoScreen';
+import AndroidHomeDemoScreen from '../screens/AndroidHomeDemoScreen';
+import BookingDetailScreen from '../screens/BookingDetailScreen';
+
+
 
 
 type RootStackParamList = {
@@ -92,9 +100,6 @@ type RootStackParamList = {
   ReanimatedLayoutGallery: undefined;
   ReanimatedKeyframesLayout: undefined;
   CustomChildWrapper: undefined;
-  MotiStateMachineButton: undefined;
-  MotiToastStack: undefined;
-  MotiAnimatedTabBar: undefined;
   NativeFFmpegDemo: undefined;
   NativeMedia3Demo: undefined;
   PipDemo: undefined;
@@ -121,8 +126,19 @@ type RootStackParamList = {
   TrueSheetDemo: undefined;
   ThemeSwitchDemo: undefined;
   TypeAnimationDemo: undefined;
-  CalendarEventsDemo: undefined;
+  InputEffectsDemo: undefined;
+  ScreenTransitionsDemo: undefined;
+  NotifierAndConfettiDemo: undefined;
+  TourGuideDemo: undefined;
+  TourGuideCustomDemo: undefined;
+  RateAppDemo: undefined;
+  ReduxDevToolsDemo: undefined;
+  SkiaImageMaskerDemo: undefined;
+  BookingDetail: { booking?: any };
+  AndroidHomeDemo: undefined;
 };
+
+
 
 
 type XTHomeStackParamList = {
@@ -346,18 +362,6 @@ export default function AppNavigator() {
           component={CustomChildWrapperScreen}
         />
         <RootStack.Screen
-          name="MotiStateMachineButton"
-          component={MotiStateMachineButtonScreen}
-        />
-        <RootStack.Screen
-          name="MotiToastStack"
-          component={MotiToastStackScreen}
-        />
-        <RootStack.Screen
-          name="MotiAnimatedTabBar"
-          component={MotiAnimatedTabBarScreen}
-        />
-        <RootStack.Screen
           name="NativeMedia3Demo"
           component={Media3DemoScreen}
         />
@@ -458,9 +462,49 @@ export default function AppNavigator() {
           component={TypeAnimationDemoScreen}
         />
         <RootStack.Screen
-          name="CalendarEventsDemo"
-          component={CalendarEventsDemoScreen}
+          name="InputEffectsDemo"
+          component={InputEffectsDemoScreen}
         />
+        <RootStack.Screen
+          name="ScreenTransitionsDemo"
+          component={ScreenTransitionsDemoScreen}
+        />
+        <RootStack.Screen
+          name="NotifierAndConfettiDemo"
+          component={NotifierAndConfettiDemoScreen}
+        />
+        <RootStack.Screen
+          name="TourGuideDemo"
+          component={TourGuideDemoScreen}
+        />
+        <RootStack.Screen
+          name="TourGuideCustomDemo"
+          component={TourGuideCustomDemoScreen}
+        />
+        <RootStack.Screen
+          name="RateAppDemo"
+          component={RateAppDemoScreen}
+        />
+        <RootStack.Screen
+          name="ReduxDevToolsDemo"
+          component={ReduxDevToolsDemoScreen}
+        />
+        <RootStack.Screen
+          name="SkiaImageMaskerDemo"
+          component={SkiaImageMaskerDemoScreen}
+        />
+        <RootStack.Screen
+          name="BookingDetail"
+          component={BookingDetailScreen}
+          options={{ animation: 'slide_from_right' }}
+        />
+        <RootStack.Screen
+          name="AndroidHomeDemo"
+          component={AndroidHomeDemoScreen}
+          options={{ headerShown: false }}
+        />
+
+
       </RootStack.Navigator>
 
     </NavigationContainer>

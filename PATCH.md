@@ -15,3 +15,5 @@ This file documents manual changes made to files in `node_modules`. These change
        localAnimationConfig.type === 'circular' ||
        localAnimationConfig.type === 'inverted-circular'
 ```
+
+**Patch File**: `patches/react-native-theme-switch-animation+0.8.0.patch`

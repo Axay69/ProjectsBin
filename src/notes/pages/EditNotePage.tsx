@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Image,
   Alert,
+  Platform,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect, useMemo, useState, useRef } from 'react';
@@ -19,9 +20,10 @@ import RNFS from 'react-native-fs';
 import type { MediaItem } from '../types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ActionSheet from 'react-native-actions-sheet';
-import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import { useFocusEffect } from '@react-navigation/native';
 import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import Sound, { RecordBackType } from 'react-native-nitro-sound';
+
 import NoteWrapper from '../components/ui/NoteWrapper';
 
 type Props = NativeStackScreenProps<NotesStackParamList, 'EditNote'>;
@@ -48,34 +50,11 @@ export default function EditNotePage({ route, navigation }: Props) {
   );
   const [saving, setSaving] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [recordSecs, setRecordSecs] = useState(0);
   const audioActionSheetRef = useRef<any>(null);
-  const audioRecorderPlayer = useRef<any>(null);
 
-  useEffect(() => {
-    // AudioRecorderPlayer - initialize as instance
-    try {
-      // @ts-ignore - AudioRecorderPlayer constructor signature
-      audioRecorderPlayer.current = AudioRecorderPlayer;
-    } catch (e) {
-      console.error('AudioRecorderPlayer init error:', e);
-      // Fallback: try using default export directly
-      audioRecorderPlayer.current = AudioRecorderPlayer;
-    }
-    return () => {
-      if (
-        audioRecorderPlayer.current &&
-        typeof audioRecorderPlayer.current.stopRecorder === 'function'
-      ) {
-        audioRecorderPlayer.current.stopRecorder().catch(() => {});
-        if (
-          typeof audioRecorderPlayer.current.removeRecordBackListener ===
-          'function'
-        ) {
-          audioRecorderPlayer.current.removeRecordBackListener();
-        }
-      }
-    };
-  }, []);
+
+
 
   const theme = useMemo(() => getTheme(darkMode), [darkMode]);
 
@@ -165,9 +144,8 @@ export default function EditNotePage({ route, navigation }: Props) {
     const asset = res.assets?.[0];
     if (!asset || !asset.uri) return;
     const src = asset.uri;
-    const dest = `${RNFS.DocumentDirectoryPath}/${Date.now()}_${
-      asset.fileName ?? 'media'
-    }`;
+    const dest = `${RNFS.DocumentDirectoryPath}/${Date.now()}_${asset.fileName ?? 'media'
+      }`;
     try {
       await RNFS.copyFile(src.replace('file://', ''), dest);
       const mediaType = type === 'photo' ? 'image' : 'video';
@@ -193,10 +171,9 @@ export default function EditNotePage({ route, navigation }: Props) {
 
   const pickAudioFile = async () => {
     audioActionSheetRef.current?.hide();
-    // For now, create placeholder - user needs to add react-native-audio-recorder-player for recording
     const dest = `${RNFS.DocumentDirectoryPath}/${Date.now()}_audio.m4a`;
     try {
-      // Placeholder - in real implementation, use audio picker library
+      // Placeholder
       await RNFS.writeFile(dest, '', 'utf8');
       const item: MediaItem = {
         id: `${Date.now()}_audio`,
@@ -207,7 +184,7 @@ export default function EditNotePage({ route, navigation }: Props) {
       setAttachments(prev => [...prev, item]);
       Alert.alert(
         'Audio added',
-        'Audio file placeholder added. Install react-native-audio-recorder-player for full recording support.',
+        'Audio file placeholder added.',
       );
     } catch (e) {
       Alert.alert('Error', 'Could not add audio file.');
@@ -216,14 +193,14 @@ export default function EditNotePage({ route, navigation }: Props) {
 
   const recordAudio = async () => {
     audioActionSheetRef.current?.hide();
-    if (!audioRecorderPlayer.current) {
-      Alert.alert('Error', 'Audio recorder not initialized');
-      return;
-    }
 
     try {
       // Request microphone permission
-      const permissionResult = await request(PERMISSIONS.ANDROID.RECORD_AUDIO);
+      const permissionResult = await request(
+        Platform.OS === 'android'
+          ? PERMISSIONS.ANDROID.RECORD_AUDIO
+          : PERMISSIONS.IOS.MICROPHONE,
+      );
       if (permissionResult !== RESULTS.GRANTED) {
         Alert.alert(
           'Permission Required',
@@ -234,8 +211,8 @@ export default function EditNotePage({ route, navigation }: Props) {
 
       if (recording) {
         // Stop recording
-        const result = await audioRecorderPlayer.current.stopRecorder();
-        audioRecorderPlayer.current.removeRecordBackListener();
+        const result = await Sound.stopRecorder();
+        Sound.removeRecordBackListener();
         setRecording(false);
 
         if (result) {
@@ -250,12 +227,11 @@ export default function EditNotePage({ route, navigation }: Props) {
         }
       } else {
         // Start recording
-        const path = `${RNFS.DocumentDirectoryPath}/audio_${Date.now()}.m4a`;
-        const msg = await audioRecorderPlayer.current.startRecorder(path);
-        audioRecorderPlayer.current.addRecordBackListener((e: any) => {
-          // Recording progress callback - can be used to show duration
-          console.log('Recording progress:', e.currentPosition);
+        Sound.addRecordBackListener((e: RecordBackType) => {
+          setRecordSecs(Math.floor(e.currentPosition / 1000));
         });
+
+        const result = await Sound.startRecorder();
         setRecording(true);
         Alert.alert(
           'Recording',
@@ -264,18 +240,16 @@ export default function EditNotePage({ route, navigation }: Props) {
             {
               text: 'Stop Recording',
               onPress: async () => {
-                if (!audioRecorderPlayer.current) return;
                 try {
-                  const result =
-                    await audioRecorderPlayer.current.stopRecorder();
-                  audioRecorderPlayer.current.removeRecordBackListener();
+                  const path = await Sound.stopRecorder();
+                  Sound.removeRecordBackListener();
                   setRecording(false);
 
-                  if (result) {
+                  if (path) {
                     const item: MediaItem = {
                       id: `${Date.now()}_audio`,
                       type: 'audio',
-                      uri: result,
+                      uri: path,
                       name: `Recording ${new Date().toLocaleTimeString()}`,
                     };
                     setAttachments(prev => [...prev, item]);
@@ -288,6 +262,15 @@ export default function EditNotePage({ route, navigation }: Props) {
                 }
               },
             },
+            {
+              text: 'Cancel',
+              style: 'cancel',
+              onPress: async () => {
+                await Sound.stopRecorder();
+                Sound.removeRecordBackListener();
+                setRecording(false);
+              }
+            }
           ],
         );
       }

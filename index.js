@@ -9,7 +9,6 @@ import { name as appName } from './app.json';
 import TrackPlayer from 'react-native-track-player';
 import playbackService from './src/xTunes/services/playbackService';
 
-
 AppRegistry.registerComponent(appName, () => App);
 
 // Register playback service

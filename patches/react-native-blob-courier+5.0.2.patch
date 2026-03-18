@@ -1,3 +1,4 @@
+# # # apply this patch manually
 # diff --git a/node_modules/react-native-blob-courier/android/src/main/java/io/deckers/blob_courier/fetch/DownloaderParameterFactory.kt b/node_modules/react-native-blob-courier/android/src/main/java/io/deckers/blob_courier/fetch/DownloaderParameterFactory.kt
 # index b092955..9b9b9b9 100644
 # --- a/node_modules/react-native-blob-courier/android/src/main/java/io/deckers/blob_courier/fetch/DownloaderParameterFactory.kt

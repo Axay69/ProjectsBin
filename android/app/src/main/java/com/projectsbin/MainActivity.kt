@@ -1,5 +1,4 @@
 package com.projectsbin
-import expo.modules.ReactActivityDelegateWrapper
 
 import android.content.res.Configuration
 import com.facebook.react.ReactActivity
@@ -51,5 +50,5 @@ class MainActivity : ReactActivity() {
    * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
    */
   override fun createReactActivityDelegate(): ReactActivityDelegate =
-      ReactActivityDelegateWrapper(this, BuildConfig.IS_NEW_ARCHITECTURE_ENABLED, DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled))
+      DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
 }

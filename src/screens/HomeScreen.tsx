@@ -4,10 +4,12 @@ import {
   Pressable,
   StatusBar,
   ScrollView,
+  Linking,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { createStyleSheet, useStyles } from 'react-native-unistyles';
+import axios from 'axios';
 import '../styles/unistyles';
 
 type RootStackParamList = {
@@ -33,9 +35,6 @@ type RootStackParamList = {
   ReanimatedLayoutGallery: undefined;
   ReanimatedKeyframesLayout: undefined;
   CustomChildWrapper: undefined;
-  MotiStateMachineButton: undefined;
-  MotiToastStack: undefined;
-  MotiAnimatedTabBar: undefined;
   MotionX: undefined;
   SystemNavigationBarDemo: undefined;
   NativeFFmpegDemo: undefined;
@@ -64,9 +63,18 @@ type RootStackParamList = {
   DraggableDemo: undefined;
   TrueSheetDemo: undefined;
   ThemeSwitchDemo: undefined;
-  TypeAnimationDemo: undefined;
-  CalendarEventsDemo: undefined;
+  InputEffectsDemo: undefined;
+  ScreenTransitionsDemo: undefined;
+  NotifierAndConfettiDemo: undefined;
+  TourGuideDemo: undefined;
+  TourGuideCustomDemo: undefined;
+  RateAppDemo: undefined;
+  ReduxDevToolsDemo: undefined;
+  SkiaImageMaskerDemo: undefined;
+  AndroidHomeDemo: undefined;
 };
+
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -85,6 +93,21 @@ export default function HomeScreen({ navigation }: Props) {
         style={styles.list}
         showsVerticalScrollIndicator={false}
       >
+        <TaskItem
+          title="Outlook Login"
+          subtitle="Login with Email or Outlook"
+          onPress={async () => {
+            try {
+              console.log('[OutlookLogin] Fetching auth URL...');
+              const response = await axios.get('https://c392-2405-201-200c-90ad-5049-aa64-52f4-9152.ngrok-free.app/auth/outlook/url');
+              const { link } = response.data;
+              console.log('[OutlookLogin] Redirecting to:', link);
+              Linking.openURL(link).catch(err => console.error('[OutlookLogin] Error opening URL:', err));
+            } catch (error) {
+              console.error('[OutlookLogin] Error initiating login:', error);
+            }
+          }}
+        />
         <TaskItem
           title="Task 1: Counter"
           subtitle="useState and typed props"
@@ -194,21 +217,6 @@ export default function HomeScreen({ navigation }: Props) {
           title="Reanimated: Custom Child Wrapper"
           subtitle="Animate child layout when grid reshapes"
           onPress={() => navigation.navigate('CustomChildWrapper')}
-        />
-        <TaskItem
-          title="Moti: State Machine Button"
-          subtitle="Idle→Loading→Success/Error morphing"
-          onPress={() => navigation.navigate('MotiStateMachineButton')}
-        />
-        <TaskItem
-          title="Moti: Toast Stack"
-          subtitle="Slide in, auto-dismiss, smooth reflow"
-          onPress={() => navigation.navigate('MotiToastStack')}
-        />
-        <TaskItem
-          title="Moti: Animated Tab Bar"
-          subtitle="Sliding indicator, scale + color"
-          onPress={() => navigation.navigate('MotiAnimatedTabBar')}
         />
         <TaskItem
           title="MotionX"
@@ -331,10 +339,52 @@ export default function HomeScreen({ navigation }: Props) {
           onPress={() => navigation.navigate('TypeAnimationDemo')}
         />
         <TaskItem
-          title="Calendar Events"
-          subtitle="Native calendar events and dialogs"
-          onPress={() => navigation.navigate('CalendarEventsDemo')}
+          title="Input Effects Demo"
+          subtitle="Animated text inputs (Sae, Hoshi, Fumi, Kohana)"
+          onPress={() => navigation.navigate('InputEffectsDemo')}
         />
+        <TaskItem
+          title="Screen Transitions"
+          subtitle="Shared Element Transitions & Animations"
+          onPress={() => navigation.navigate('ScreenTransitionsDemo')}
+        />
+        <TaskItem
+          title="Notifier & Confetti"
+          subtitle="Custom notifications & confetti effects"
+          onPress={() => navigation.navigate('NotifierAndConfettiDemo')}
+        />
+        <TaskItem
+          title="Tour Guide Demo"
+          subtitle="App onboarding & feature highlights"
+          onPress={() => navigation.navigate('TourGuideDemo')}
+        />
+        <TaskItem
+          title="Custom Tour Guide"
+          subtitle="Custom Tooltips & Styles"
+          onPress={() => navigation.navigate('TourGuideCustomDemo')}
+        />
+        <TaskItem
+          title="Rate App Demo"
+          subtitle="In-app reviews & store redirect"
+          onPress={() => navigation.navigate('RateAppDemo')}
+        />
+        <TaskItem
+          title="Redux DevTools Demo"
+          subtitle="Time-travel debugging & state diffs"
+          onPress={() => navigation.navigate('ReduxDevToolsDemo')}
+        />
+        <TaskItem
+          title="Skia Image Masker"
+          subtitle="Punch-out masking for AI clothes swapping"
+          onPress={() => navigation.navigate('SkiaImageMaskerDemo')}
+        />
+        <TaskItem
+          title="Android Home Demo"
+          subtitle="4x5 Grid Layout with Swipeable Pages"
+          onPress={() => navigation.navigate('AndroidHomeDemo')}
+        />
+
+
       </ScrollView>
     </SafeAreaView>
   );
