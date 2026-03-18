@@ -17,3 +17,12 @@ This file documents manual changes made to files in `node_modules`. These change
 ```
 
 **Patch File**: `patches/react-native-theme-switch-animation+0.8.0.patch`
+
+# diff --git a/node_modules/react-native/sdks/hermes-engine/version.properties b/node_modules/react-native/sdks/hermes-engine/version.properties
+# new file mode 100644
+# index 0000000..e0fc671
+# --- /dev/null
+# +++ b/node_modules/react-native/sdks/hermes-engine/version.properties
+# @@ -0,0 +1,2 @@
+# +HERMES_VERSION_NAME=0.81.4
+# +HERMES_V1_VERSION_NAME=0.81.4

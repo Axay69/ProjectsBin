@@ -1,0 +1,50 @@
+diff --git a/android/src/main/java/io/deckers/blob_courier/fetch/DownloaderParameterFactory.kt b/android/src/main/java/io/deckers/blob_courier/fetch/DownloaderParameterFactory.kt
+index 4472b5c5352c5432dcbc472ac83e32f6faf832ce..f75e943a712d1abfa8dd896ae8aa649d0341a7c5 100644
+--- a/android/src/main/java/io/deckers/blob_courier/fetch/DownloaderParameterFactory.kt
++++ b/android/src/main/java/io/deckers/blob_courier/fetch/DownloaderParameterFactory.kt
+@@ -93,8 +93,9 @@ private fun validateParameters(
+         t.name.equals(targetDirectoryOrFallback, ignoreCase = true)
+       }
+ 
++  @Suppress("UNCHECKED_CAST")
+   val downloadManagerSettings =
+-    maybeAndroidSettings?.getMap(PARAMETER_DOWNLOAD_MANAGER_SETTINGS)?.toHashMap().orEmpty()
++    (maybeAndroidSettings?.getMap(PARAMETER_DOWNLOAD_MANAGER_SETTINGS)?.toHashMap() as Map<String, Any>?).orEmpty()
+ 
+   val useDownloadManager =
+     maybeAndroidSettings?.let { b ->
+@@ -102,8 +103,9 @@ private fun validateParameters(
+         b.getBoolean(PARAMETER_USE_DOWNLOAD_MANAGER)
+     } ?: false
+ 
++  @Suppress("UNCHECKED_CAST")
+   val unfilteredHeaders =
+-    input.getMap(PARAMETER_HEADERS)?.toHashMap() ?: emptyMap<String, Any>()
++    input.getMap(PARAMETER_HEADERS)?.toHashMap() as? Map<String, Any> ?: emptyMap<String, Any>()
+ 
+   val headers = filterHeaders(unfilteredHeaders)
+ 
+diff --git a/android/src/main/java/io/deckers/blob_courier/upload/UploaderParameterFactory.kt b/android/src/main/java/io/deckers/blob_courier/upload/UploaderParameterFactory.kt
+index 7a7dadc1d741838ef6f9ac1ef59bb092e1b5e807..60fde2c7722ae2922f05f95269fc70a74745b477 100644
+--- a/android/src/main/java/io/deckers/blob_courier/upload/UploaderParameterFactory.kt
++++ b/android/src/main/java/io/deckers/blob_courier/upload/UploaderParameterFactory.kt
+@@ -212,7 +212,7 @@ private fun validateParts(parts: ReadableArray): ValidationResult<List<Part>> {
+       ValidationError.InvalidType(
+         "parts",
+         "ReadableMap[]",
+-        parts.toArrayList().map { it.javaClass.name }.joinToString { ";" }
++        parts.toArrayList().map { it?.javaClass?.name ?: "null" }.joinToString { ";" }
+       )
+     )
+   }
+@@ -249,8 +249,9 @@ class UploaderParameterFactory {
+ 
+         val method = maybe(input.getString(PARAMETER_METHOD)).ifNone(DEFAULT_UPLOAD_METHOD)
+ 
++        @Suppress("UNCHECKED_CAST")
+         val unfilteredHeaders =
+-          input.getMap(PARAMETER_HEADERS)?.toHashMap() ?: emptyMap<String, Any>()
++          input.getMap(PARAMETER_HEADERS)?.toHashMap() as? Map<String, Any> ?: emptyMap<String, Any>()
+ 
+         val headers = filterHeaders(unfilteredHeaders)
+ 
