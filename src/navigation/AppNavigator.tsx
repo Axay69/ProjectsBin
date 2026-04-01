@@ -41,9 +41,9 @@ import CustomSliderDemoScreen from '../screens/CustomSliderDemoScreen';
 import StateManagementRDScreen from '../screens/StateManagementRDScreen';
 import ContextDemoScreen from '../screens/ContextDemoScreen';
 import ZustandDemoScreen from '../screens/ZustandDemoScreen';
-import ZegoCloudDemoScreen from '../screens/ZegoCloudDemoScreen';
-import ZegoCloudProDemoScreen from '../screens/ZegoCloudProDemoScreen';
-import ZegoScreenCastingDemoScreen from '../screens/ZegoScreenCastingDemoScreen';
+// import ZegoCloudDemoScreen from '../screens/ZegoCloudDemoScreen';
+// import ZegoCloudProDemoScreen from '../screens/ZegoCloudProDemoScreen';
+// import ZegoScreenCastingDemoScreen from '../screens/ZegoScreenCastingDemoScreen';
 import RiveAnimationDemoScreen from '../screens/RiveAnimationDemoScreen';
 import StickyHeaderDemoScreen from '../screens/StickyHeaderDemoScreen';
 import MeshGradientDemoScreen from '../screens/MeshGradientDemoScreen';
@@ -69,6 +69,7 @@ import ReduxDevToolsDemoScreen from '../screens/ReduxDevToolsDemoScreen';
 import SkiaImageMaskerDemoScreen from '../screens/SkiaImageMaskerDemoScreen';
 import AndroidHomeDemoScreen from '../screens/AndroidHomeDemoScreen';
 import BookingDetailScreen from '../screens/BookingDetailScreen';
+import ThreeDModelDemoScreen from '../screens/ThreeDModelDemoScreen';
 
 
 
@@ -108,9 +109,9 @@ type RootStackParamList = {
   StateManagementRD: undefined;
   ContextDemo: undefined;
   ZustandDemo: undefined;
-  ZegoCloudDemo: undefined;
-  ZegoCloudProDemo: undefined;
-  ZegoScreenCastingDemo: undefined;
+  //   ZegoCloudDemo: undefined;
+  //   ZegoCloudProDemo: undefined;
+  //   ZegoScreenCastingDemo: undefined;
   RiveAnimationDemo: undefined;
   StickyHeaderDemo: undefined;
   MeshGradientDemo: undefined;
@@ -136,6 +137,8 @@ type RootStackParamList = {
   SkiaImageMaskerDemo: undefined;
   BookingDetail: { booking?: any };
   AndroidHomeDemo: undefined;
+  SharedElementDemo: undefined;
+  ThreeDModelDemo: undefined;
 };
 
 
@@ -270,7 +273,7 @@ export default function AppNavigator() {
         <RootStack.Screen name="Home" component={HomeScreen} />
         <RootStack.Screen name="Counter" component={CounterScreen} />
         <RootStack.Screen name="Todos" component={TodoScreen} />
-        <RootStack.Screen name="MotionX" children={() => <MotionXFlow />} />
+        {/* <RootStack.Screen name="MotionX" children={() => <MotionXFlow />} /> */}
         <RootStack.Screen name="XTunes" component={XTunesNavigator} />
         <RootStack.Screen
           name="SystemNavigationBarDemo"
@@ -390,18 +393,6 @@ export default function AppNavigator() {
           component={ZustandDemoScreen}
         />
         <RootStack.Screen
-          name="ZegoCloudDemo"
-          component={ZegoCloudDemoScreen}
-        />
-        <RootStack.Screen
-          name="ZegoCloudProDemo"
-          component={ZegoCloudProDemoScreen}
-        />
-        <RootStack.Screen
-          name="ZegoScreenCastingDemo"
-          component={ZegoScreenCastingDemoScreen}
-        />
-        <RootStack.Screen
           name="RiveAnimationDemo"
           component={RiveAnimationDemoScreen}
         />
@@ -501,8 +492,18 @@ export default function AppNavigator() {
         <RootStack.Screen
           name="AndroidHomeDemo"
           component={AndroidHomeDemoScreen}
-          options={{ headerShown: false }}
         />
+        <RootStack.Screen
+          name="ThreeDModelDemo"
+          component={ThreeDModelDemoScreen}
+        />
+        {/*
+         <RootStack.Screen
+          name="SharedElementDemo"
+          component={SharedElementDemoNavigator}
+        />
+        
+        */}
 
 
       </RootStack.Navigator>

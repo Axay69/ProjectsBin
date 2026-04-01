@@ -46,9 +46,9 @@ type RootStackParamList = {
   StateManagementRD: undefined;
   ContextDemo: undefined;
   ZustandDemo: undefined;
-  ZegoCloudDemo: undefined;
-  ZegoCloudProDemo: undefined;
-  ZegoScreenCastingDemo: undefined;
+  //   ZegoCloudDemo: undefined;
+  //   ZegoCloudProDemo: undefined;
+  //   ZegoScreenCastingDemo: undefined;
   RiveAnimationDemo: undefined;
   StickyHeaderDemo: undefined;
   MeshGradientDemo: undefined;
@@ -58,6 +58,7 @@ type RootStackParamList = {
   UnistylesDemo: undefined;
   ContextMenuDemo: undefined;
   D3ShapeDemo: undefined;
+  TypeAnimationDemo: undefined;
   SkiaLiquidDemo: undefined;
   SkiaAudioVisualizer: undefined;
   DraggableDemo: undefined;
@@ -72,6 +73,7 @@ type RootStackParamList = {
   ReduxDevToolsDemo: undefined;
   SkiaImageMaskerDemo: undefined;
   AndroidHomeDemo: undefined;
+  ThreeDModelDemo: undefined;
 };
 
 
@@ -253,6 +255,7 @@ export default function HomeScreen({ navigation }: Props) {
           subtitle="Zustand vs Context - Measure re-render counts"
           onPress={() => navigation.navigate('StateManagementRD')}
         />
+        {/*
         <TaskItem
           title="ZegoCloud Demo"
           subtitle="1-on-1 Voice & Video Calls"
@@ -268,6 +271,7 @@ export default function HomeScreen({ navigation }: Props) {
           subtitle="Android screen sharing in gallery layout"
           onPress={() => navigation.navigate('ZegoScreenCastingDemo')}
         />
+        */}
         <TaskItem
           title="Rive Animation Demo"
           subtitle="Interactive Rive animations (Bunny, Bear)"
@@ -383,7 +387,11 @@ export default function HomeScreen({ navigation }: Props) {
           subtitle="4x5 Grid Layout with Swipeable Pages"
           onPress={() => navigation.navigate('AndroidHomeDemo')}
         />
-
+        <TaskItem
+          title="3D Model Demo"
+          subtitle="React Three Fiber & Drei integration"
+          onPress={() => navigation.navigate('ThreeDModelDemo')}
+        />
 
       </ScrollView>
     </SafeAreaView>
